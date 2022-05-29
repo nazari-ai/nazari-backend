@@ -3,7 +3,7 @@
 async def test_twitter(schema,):
 
     query = """
-    query TestQuery($asaID: String!, $startDate: Date!, $endDate: Date) {
+    query TestQuery($asaID: String!, $startDate: Date, $endDate: Date) {
         twitter(asaID: $asaID, startDate: $startDate, endDate: $endDate){
             likes
             retweets
@@ -17,7 +17,7 @@ async def test_twitter(schema,):
     result = await schema.execute(
         query,
         variable_values={
-            "asaID": "ChoicrCoin",
+            "asaID": "ChoiceCoin",
             "startDate": "2021-03-01",
             "endDate": "2021-03-21",
         },
@@ -35,7 +35,7 @@ async def test_twitter(schema,):
             ],
             "retweets": [32, 12, 45, 2, 4],
             "likes": [50, 3, 5, 0, 0],
-            "sentimentScore": [0.7, 0.4, 0.6, 0.3, 0.3],
+            "sentimentScores": [0.7, 0.4, 0.6, 0.3, 0.3],
         }
     ]
 
@@ -47,12 +47,12 @@ async def test_twitter(schema,):
 async def test_reddit(schema):
 
     query = """
-    query TestQuery($asaID: String!, $startDate: Date!, $endDate: Date) {
+    query TestQuery($asaID: String!, $startDate: Date, $endDate: Date) {
         reddit(asaID: $asaID, startDate: $startDate, endDate: $endDate){
             postID{
                 text
                 postUrl
-                sentimentScore
+                sentimentScores
                 timeCreated
                 comments{
                     SentimentScoreComments
@@ -79,7 +79,7 @@ async def test_reddit(schema):
             "jdnckosl": {
                 "text": "Heyy! Yo! This coin is to the moon !!",
                 "postUrl": "getpost.com",
-                "sentimentScore": 0.8,
+                "sentimentScores": 0.8,
                 "timeCreated": "2021-02-28",
                 "comments": {
                     "SentimentScoreComments": [0.7, 0.4, 0.6, 0.3, 0.3],
