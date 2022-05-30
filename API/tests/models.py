@@ -1,60 +1,60 @@
-from sqlalchemy import Column, DateTime, BigInteger, String, Integer, Float, ForeignKey
-from conftest import Base
-from sqlalchemy.orm import relationship
-
-Base = declarative_base()
+from tortoise.models import Model
+from tortoise import fields
 
 
-class Twitter(Base):
-    __tablename__ = "twitter"
+class Twitter(Model):
+    tweet_id = fields.BigIntField(pk=True)
+    tweet = fields.TextField()
+    posted_at = fields.DateTimeField(auto_now_add=False)
+    likes = fields.IntegerField()
+    retweets = fields.IntegerField()
+    sentiment_score = fields.FloatField()
+    asa_id = fields.TextField()
 
-    tweet_id = Column(BigInteger, primary_key=True)
-    tweet = Column(String)
-    posted_at = Column(DateTime)
-    likes = Column(Integer)
-    retweets = Column(Integer)
-    sentiment_score = Column(Float)
-    asa_id = Column(String)
-
-
-class Reddit_Post_Table(Base):
-    __tablename__ = "reddit_post_table"
-
-    post_id = Column(String)
-    title = Column(String)
-    text = Column(String)
-    score = Column(Integer)
-    num_of_comments = Column(Integer)
-    time_created = Column(DateTime)
-    url = Column(String)
-    sentiment_score = Column(Integer)
-
-    comments = relationship("Reddit_Comment_Table")
+    class Meta:
+        table = "twitterTable"
 
 
-class Reddit_Comment_Table(Base):
-    __tablename__ = "reddit_comment_table"
+class RedditPostTable(Model):
+    post_id = fields.CharField(pk=True)
+    title = fields.TextField()
+    text = fields.TextField()
+    score = fields.IntegerField()
+    num_of_comments = fields.IntegerField()
+    time_created = fields.DateTimeField(auto_now_add=False)
+    url = fields.TextField()
+    sentiment_score = fields.FloatField()
 
-    comment_id = Column(String)
-    body = Column(String)
-    score = Column(Integer)
-    time_created = Column(DateTime)
-    sentiment_score = Column(Float)
-    post_id = Column(String, ForeignKey("reddit_post_table.post_id"))
+    class Meta:
+        table = "redditPostTable"
 
 
-class Github(Base):
-    __tablename__ = "github"
+class RedditCommentTable(Model):
+    comment_id = fields.CharField(pk=True)
+    body = fields.TextField()
+    score = fields.IntegerField()
+    time_created = fields.DateTimeField(auto_now_add=False)
+    sentiment_score = fields.FloatField()
+    post_id = fields.ForeignKey("models.RedditPostTable", related_name="post_id")
 
-    repo_name = Column(String, primary_key=True)
-    repo_desc = Column(String)
-    date_created = Column(DateTime)
-    last_date = Column(DateTime)
-    language = Column(String)
-    no_of_forks = Column(Integer)
-    no_of_stars = Column(Integer)
-    no_of_watches = Column(Integer)
-    no_of_contributors = Column(Integer)
-    no_of_commits = Column(Integer)
-    issues = Column(Integer)
-    pull_requests = Column(Integer)
+    class Meta:
+        table = "redditCommentTable"
+
+
+class Github(Model):
+    repo_name = fields.CharField(pk=True)
+    repo_desc = fields.TextField()
+    date_created = fields.DateTimeField(auto_now_add=False)
+    last_date = fields.DateTimeField(auto_now_add=False)
+    language = fields.CharField()
+    no_of_forks = fields.IntegerField()
+    no_of_stars = fields.IntegerField()
+    no_of_watches = fields.IntegerField()
+    no_of_contributors = fields.IntegerField()
+    no_of_commits = fields.IntegerField()
+    issues = fields.IntegerField()
+    pull_requests = fields.IntegerField()
+
+    class Meta:
+        table = "githubTable"
+
