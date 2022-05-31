@@ -3,8 +3,8 @@
 async def test_twitter(schema,):
 
     query = """
-    query TestQuery($asaID: String!, $startDate: Date, $endDate: Date) {
-        twitter(asaID: $asaID, startDate: $startDate, endDate: $endDate){
+    query TestQuery($asaID: String!, $startDate: Date, $endDate: Date, $weekDay: str, $hour: int) {
+        twitter(asaID: $asaID, startDate: $startDate, endDate: $endDate, weekDay: $weekDay, hour: $hour){
             likes
             retweets
             createdTime
@@ -26,7 +26,7 @@ async def test_twitter(schema,):
     assert result.errors is None
     assert result.data["twitter"] == [
         {
-            "created_time": [
+            "createdTime": [
                 "2021-03-01",
                 "2021-03-06",
                 "2021-03-08",
@@ -47,12 +47,12 @@ async def test_twitter(schema,):
 async def test_reddit(schema):
 
     query = """
-    query TestQuery($asaID: String!, $startDate: Date, $endDate: Date) {
-        reddit(asaID: $asaID, startDate: $startDate, endDate: $endDate){
+    query TestQuery($asaID: String!, $startDate: Date, $endDate: Date, $weekDay: str, $hour: int) {
+        reddit(asaID: $asaID, startDate: $startDate, endDate: $endDate, weekDay: $weekDay, hour: $hour){
             postID{
                 text
                 postUrl
-                sentimentScores
+                sentimentScore
                 timeCreated
                 comments{
                     SentimentScoreComments
@@ -79,8 +79,9 @@ async def test_reddit(schema):
             "jdnckosl": {
                 "text": "Heyy! Yo! This coin is to the moon !!",
                 "postUrl": "getpost.com",
-                "sentimentScores": 0.8,
+                "sentimentScore": 0.8,
                 "timeCreated": "2021-02-28",
+                "score": 41,
                 "comments": {
                     "SentimentScoreComments": [0.7, 0.4, 0.6, 0.3, 0.3],
                     "upvotesComments": [50, 3, 5, 0, 0],
@@ -102,8 +103,8 @@ async def test_reddit(schema):
 async def test_gtihub(schema):
 
     query = """
-    query TestQuery($asaID: String!) {
-        github(asaID: $asaID){
+    query TestQuery($asaID: String!, $startDate: Date, $endDate: Date, $weekDay: str, $hour: int) {
+        github(asaID: $asaID, startDate: $startDate, endDate: $endDate, weekDay: $weekDay, hour: $hour){
             dateCreated
             language
             commits
@@ -113,7 +114,7 @@ async def test_gtihub(schema):
             contributors
             pullRequests
             issues
-            repos{
+            repos[
                 repoName
                 dateCreated
                 lastPushDate
@@ -125,7 +126,7 @@ async def test_gtihub(schema):
                 contributors
                 pullRequests
                 issues
-            }
+            ]
         }
     """
 
@@ -135,7 +136,7 @@ async def test_gtihub(schema):
     assert result.data["github"] == [
         {
             "dateCreated": "2020-07-01",
-            "language": ["python"],
+            "languages": ["rust", "ruby", "scala"],
             "commits": 54,
             "forks": 12,
             "stars": 124,
@@ -143,18 +144,46 @@ async def test_gtihub(schema):
             "contributors": 31,
             "pullRequests": 71,
             "issues": 21,
-            "repos": {
-                "repoName": ["repo1", "repo2", "repo3"],
-                "dateCreated": ["2020-07-05", "2021-02-01", "2022-01-31"],
-                "lastPushDate": ["2021-03-01", "2022-04-01", "2022-04-31"],
-                "language": ["rust", "ruby", "scala"],
-                "commits": [14, 20, 20],
-                "forks": [6, 3, 3],
-                "stars": [24, 50, 50],
-                "watchers": [22, 12, 18],
-                "contributors": [7, 4, 20],
-                "pullRequests": [13, 41, 17],
-                "issues": [5, 11, 5],
-            },
+            "repos": [
+                {
+                    "repoName": "repo1",
+                    "dateCreated": "2020-07-05",
+                    "lastPushDate": "2021-03-01",
+                    "language": "rust",
+                    "commits": 14,
+                    "forks": 6,
+                    "stars": 24,
+                    "watchers": 22,
+                    "contributors": 7,
+                    "pullRequests": 13,
+                    "issues": 5,
+                },
+                {
+                    "repoName": "repo2",
+                    "dateCreated": "2021-02-01",
+                    "lastPushDate": "2022-04-01",
+                    "language": "ruby",
+                    "commits": 20,
+                    "forks": 3,
+                    "stars": 50,
+                    "watchers": 12,
+                    "contributors": 4,
+                    "pullRequests": 41,
+                    "issues": 11,
+                },
+                {
+                    "repoName": "repo3",
+                    "dateCreated": "2022-01-31",
+                    "lastPushDate": "2022-04-31",
+                    "language": "scala",
+                    "commits": 20,
+                    "forks": 3,
+                    "stars": 50,
+                    "watchers": 18,
+                    "contributors": 20,
+                    "pullRequests": 17,
+                    "issues": 5,
+                },
+            ],
         }
     ]

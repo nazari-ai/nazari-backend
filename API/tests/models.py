@@ -55,6 +55,7 @@ class Github(Model):
     no_of_commits = fields.IntegerField()
     issues = fields.IntegerField()
     pull_requests = fields.IntegerField()
+    asa_id = fields.CharField()
 
     class Meta:
         table = "githubTable"
