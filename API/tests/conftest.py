@@ -24,7 +24,7 @@ def initialize_db(request):
 
 
 ## Populate database
-@pytest.fixture(session="session")
+@pytest.fixture(scope="session")
 def populate_twitter_db():
     Twitter.create(
         tweet_id=1213245124,
