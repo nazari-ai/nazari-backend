@@ -24,6 +24,7 @@ class RedditPostTable(Model):
     time_created = fields.DateTimeField(auto_now_add=False)
     url = fields.TextField()
     sentiment_score = fields.FloatField()
+    asa_id = fields.CharField()
 
     class Meta:
         table = "redditPostTable"
