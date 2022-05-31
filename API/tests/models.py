@@ -5,9 +5,9 @@ from tortoise import fields
 class Twitter(Model):
     tweet_id = fields.BigIntField(pk=True)
     tweet = fields.TextField()
-    posted_at = fields.DateTimeField(auto_now_add=False)
-    likes = fields.IntegerField()
-    retweets = fields.IntegerField()
+    posted_at = fields.DatetimeField(auto_now_add=False)
+    likes = fields.IntField()
+    retweets = fields.IntField()
     sentiment_score = fields.FloatField()
     asa_id = fields.TextField()
 
@@ -16,47 +16,46 @@ class Twitter(Model):
 
 
 class RedditPostTable(Model):
-    post_id = fields.CharField(pk=True)
+    post_id = fields.CharField(pk=True, max_length=10)
     title = fields.TextField()
     text = fields.TextField()
-    score = fields.IntegerField()
-    num_of_comments = fields.IntegerField()
-    time_created = fields.DateTimeField(auto_now_add=False)
+    score = fields.IntField()
+    num_of_comments = fields.IntField()
+    time_created = fields.DatetimeField(auto_now_add=False)
     url = fields.TextField()
     sentiment_score = fields.FloatField()
-    asa_id = fields.CharField()
+    asa_id = fields.TextField()
 
     class Meta:
         table = "redditPostTable"
 
 
 class RedditCommentTable(Model):
-    comment_id = fields.CharField(pk=True)
+    comment_id = fields.CharField(pk=True, max_length=10)
     body = fields.TextField()
-    score = fields.IntegerField()
-    time_created = fields.DateTimeField(auto_now_add=False)
+    score = fields.IntField()
+    time_created = fields.DatetimeField(auto_now_add=False)
     sentiment_score = fields.FloatField()
-    post_id = fields.ForeignKey("models.RedditPostTable", related_name="post_id")
+    post_id = fields.ForeignKeyField("models.RedditPostTable", related_name="post_id")
 
     class Meta:
         table = "redditCommentTable"
 
 
 class Github(Model):
-    repo_name = fields.CharField(pk=True)
+    repo_name = fields.CharField(pk=True, max_length=256)
     repo_desc = fields.TextField()
-    date_created = fields.DateTimeField(auto_now_add=False)
-    last_date = fields.DateTimeField(auto_now_add=False)
-    language = fields.CharField()
-    no_of_forks = fields.IntegerField()
-    no_of_stars = fields.IntegerField()
-    no_of_watches = fields.IntegerField()
-    no_of_contributors = fields.IntegerField()
-    no_of_commits = fields.IntegerField()
-    issues = fields.IntegerField()
-    pull_requests = fields.IntegerField()
-    asa_id = fields.CharField()
+    date_created = fields.DatetimeField(auto_now_add=False)
+    last_date = fields.DatetimeField(auto_now_add=False)
+    language = fields.CharField(max_length=100)
+    no_of_forks = fields.IntField()
+    no_of_stars = fields.IntField()
+    no_of_watches = fields.IntField()
+    no_of_contributors = fields.IntField()
+    no_of_commits = fields.IntField()
+    issues = fields.IntField()
+    pull_requests = fields.IntField()
+    asa_id = fields.TextField()
 
     class Meta:
         table = "githubTable"
-
