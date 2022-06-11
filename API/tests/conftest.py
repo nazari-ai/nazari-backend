@@ -11,14 +11,14 @@ from models import Twitter, RedditCommentTable, RedditPostTable, Github
 # API librabries/modules
 import strawberry
 from strawberry.asgi import GraphQL
-from schema import Query
+# from schema import Query
 
 ## Database connection
 
 
 @pytest.fixture(scope="session", autouse=True)
 def initialize_db(request):
-    db_url = "postgres://postgres:@127.0.0.1:5432/test_{}"
+    db_url = "postgres://postgres:@127.0.0.1:5432/test_db{}"
     initializer(["models"], db_url=db_url)
     request.addfinalizer(finalizer)
 
