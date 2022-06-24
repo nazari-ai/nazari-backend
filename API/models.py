@@ -11,8 +11,8 @@ class Twitter(Model):
     sentiment_score = fields.FloatField()
     asa_id = fields.TextField()
     dow = fields.IntField()
-    hour = fields.IntField()
-    month = fields.IntField()
+    # hour = fields.IntField()
+    # month = fields.IntField()
 
     class Meta:
         table = "twitterTable"

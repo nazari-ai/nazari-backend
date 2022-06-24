@@ -1,4 +1,3 @@
-from tortoise import Tortoise, run_async
 from tortoise.contrib.fastapi import HTTPNotFoundError, register_tortoise
 from typing import List
 from fastapi import FastAPI, HTTPException
@@ -15,7 +14,7 @@ app.add_route("/analytics", graphql_app)
 app.add_websocket_route("/analytics", graphql_app)
 
 
-DATABASE_URL = "postgres://ernestowojori:password@127.0.0.1:5432/test_db"
+DATABASE_URL = "postgres://postgres:myPassword@127.0.0.1:5432/asalyticsdb"
 
 
 register_tortoise(
