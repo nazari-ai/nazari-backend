@@ -1,0 +1,261 @@
+from typing import List, Dict, Any
+from fastapi import status, HTTPException
+import strawberry
+from models import RedditPostTable, RedditCommentTable
+from reddit import RedditPostSchema, RedditCommentSchema
+from pandas import timedelta_range
+import datetime
+from tortoise.functions import Sum
+from dacite import from_dict #to simply creation of dataclasses from dictionaries.
+from models import github
+from api.github import PerRepo, PerTime, GithubAnalyticsPerTime, GithubOverview, GithubAnalyticsPerRepo
+from typing import List, Union
+from urllib import response
+from fastapi import status, HTTPException
+import strawberry
+from models import Twitter
+from twitter import  TwitterAnalytics, TwitterOverview, response
+from tortoise.functions import Avg, Count, Sum
+from dacite import from_dict
+
+
+endDate= datetime.datetime.utcnow()  #contains the current local date and time 
+startDate= endDate - datetime.timedelta(days=7) #contains 7 days from the current date and time
+
+
+class AttrDict(dict):
+    def __init__(self, *args, **kwargs):
+        super(AttrDict, self).__init__(*args, **kwargs)
+        self.__dict__ = self
+
+
+@strawberry.type
+class Query:
+    @strawberry.field 
+    async def twitterOverview(self, asaID:str) -> TwitterOverview:
+        result = await Twitter.filter(asa_id=asaID).values()
+        # print(result)
+        # print(result['asa_id'])
+        # print(len(result['tweet']))
+        result = {key: [i[key] for i in result] for key in result[0]}
+        result = AttrDict(result)
+
+        return TwitterOverview(
+            asaID = result['asa_id'][0],
+            tweetTotal = len(result['tweet']),
+            likeTotal = sum(result['likes']),
+            retweetTotal = sum(result['retweets']),
+            sentimentTotal = sum(result['sentiment_score'])
+        )
+
+    @strawberry.field
+    async def twitterAnalytics(self, asaID:str, startDate:str = '2021-03-01', endDate:str = '2021-03-21', weekday: bool=False, hour: bool=False) -> response:
+        
+        if weekday and hour:
+
+            raise Exception("Error! Analyze weekday or hour")
+
+        if weekday:
+            
+            result = await Twitter.\
+                filter(asa_id = asaID).\
+                filter(posted_at__range = [startDate, endDate]).\
+                annotate(likes = Sum("likes"), retweets = Sum('retweets'),
+                sentiment = Sum("sentiment_score")).\
+                group_by("dow").\
+                values("dow", "likes", "retweets", "sentiment")
+
+            
+
+        if hour:
+            result = await Twitter.\
+                filter(asa_id = asaID).\
+                filter(posted_at__range = [startDate, endDate]).\
+                annotate(likes = Sum("likes"), retweets = Sum('retweets'),
+                sentiment = Sum("sentiment_score")).\
+                group_by("hour").\
+                values("hour", "likes", "retweets", "sentiment")
+            
+
+
+        if ((hour == False) & (weekday == False)):
+            result = await Twitter.filter(asa_id = asaID).filter(posted_at__range = [startDate, endDate]).\
+                annotate(likes=Sum("likes"), retweets=Sum("retweets"), sentiment= Sum("sentiment_score")).\
+                group_by("posted_at").\
+                values("posted_at", "likes", "retweets", "sentiment")
+
+        # result = {key: [i[key] for i in result] for key in result[0]}
+
+        result = [from_dict(data_class=TwitterAnalytics, data=x) for x in result]
+        print(result)
+        
+        return response(
+                asaID = asaID,
+                results = result
+            
+            
+            # hour = result['hour'],
+            # weekday = result['dow']
+            
+
+        )
+
+
+    @strawberry.field
+    async def redditAnalytics(
+        self,
+        asaID: str,
+        # startDate: str = "2022-04-28",  # to be modified into datetime.now() in production
+        # endDate: str = "2021-02-22",  # to be modified using timedelta of 7 days
+    ) -> List[RedditPostSchema]:
+        """Resolver to generate a list of reddit posts with each post's comments nested in the schema.
+        params
+            asaID
+            startDate   default = datetime.datetime.now
+            endDate     default = datetime.datetime.now - datetime.timedelta(7)
+        returns
+            List[RedditPostSchema]
+        """
+
+        post_table = (
+            await RedditPostTable.filter(asa_id=asaID)
+            # .filter(time_created__range=[startDate, endDate])
+            .values()
+        )
+
+        async def reddit_table_to_json(post_data: RedditPostTable) -> RedditPostSchema:
+            """Function to retrieve the JSON representation of each reddit post and its comments.
+            params
+                post_data   raw data of each reddit post from the redditPostTable
+            returns
+                RedditPostSchema    the JSON representation of each reddit post as needed by the client.
+            """
+            comment_table = await RedditCommentTable.filter(
+                post_id=post_data["post_id"]
+            ).values()
+            comment_data = [
+                RedditCommentSchema(
+                    comment_id=comment["comment_id"],
+                    comment_score=comment["score"],
+                    comment_sentiment_score=comment["sentiment_score"],
+                    post_id=comment["post_id"],
+                )
+                for comment in comment_table
+            ]
+
+            post_json = RedditPostSchema(
+                asaID=post_data["asa_id"],
+                post_id=post_data["post_id"],
+                post_title=post_data["title"],
+                post_text=post_data["text"],
+                num_of_comments=post_data["num_of_comments"],
+                score=post_data["score"],
+                sentimentScore=post_data["sentiment_score"],
+                more=comment_data,
+            )
+            return post_json
+
+        return [reddit_table_to_json(post_data) for post_data in post_table]
+
+
+@strawberry.type
+class Query:
+    @strawberry.field
+    async def github_overview(self, asaID: str) -> GithubOverview:
+        """
+        This resolver function generates the sum of each github activity data in relation
+        to the typehints shown in the `GitHub Overview` schema.
+        params : asaID
+        returns : GithubOverview Schema
+        """
+        result = await github.filter(asa_id= asaID).values()
+        result= AttrDict({key: [i[key] for i in result] for key in result[0]})
+
+        return GithubOverview(
+            commits=sum(result.no_of_commits),
+            forks= sum(result.no_of_forks),
+            stars=sum(result.no_of_stars),
+            contributors=sum(result.no_of_contributors),
+            pull_requests=sum(result.pull_requests),
+            issues=sum(result.issues),
+            watches= sum(result.no_of_watches),
+            languages= result.language
+            )
+
+
+    @strawberry.field
+    async def github_analytics_perepo(self, asaID:str, sortBy:str) -> PerRepo:
+        """
+        This function generates each github activity data per repository in relation
+        to the typehints shown in the `PerRepo` schema.
+        params:      asaID
+                     sortBy: order the data by the specified activity(e.g forks, stars, pull_requests.)
+        aggregations: To aggregate data from the DB site.
+                      - Annotation of the QuerySet (sum of a total of 6 github activities).
+                      - Grouping which applies on the entire columns by "Repository Name".
+                      - Ordering by the specified `sortBy` params value.
+        returns:      PerRepo Schema - the JSON representation of each github activity as needed by the client.
+        """
+        result= await github.filter(asa_id= asaID).\
+            annotate(stars=Sum("no_of_stars"), forks=Sum("no_of_forks"),
+            contributors= Sum("no_of_contributors"), commits= Sum("no_of_commits"),
+            issues= Sum("issues"), pull_requests= Sum("pull_requests")).\
+            group_by("repo_name").order_by("-" + str(sortBy)).\
+            values("repo_name", "stars", "forks", "contributors", "commits", "issues", "pull_requests")
+
+        result= [from_dict(data_class= GithubAnalyticsPerRepo, data=x)for x in result]
+        return PerRepo(
+            repo= result
+        )
+
+
+    @strawberry.field
+    async def github_analytics_pertime(self, asaID:str, endDate:str = endDate, startDate:str =startDate, day:bool = False, weekDay:bool = False) -> PerTime:
+        """
+        This resolver function generates each github activity data per time (e.g weekday, day of the week) in relation
+        to the typehints shown in the "PerTime" schema.
+        params: asaID
+                startDate: default = datetime.datetime.now
+                endDate: default = datetime.datetime.now - datetime.timedelta(7)
+                day: default = boolean-False
+                weekday: default = boolean-False
+        aggregations: To aggregate data from the DB site.
+                      - Annotation of the QuerySet (sum of a total of 6 github activities).
+                      - Grouping which applies on the entire columns by "weekday/day_of_week/last_push_date".
+        
+        returns: PerTime Schema
+        """
+        if weekDay and day:
+            raise Exception("Error! Analyze Weekday or Day")
+            
+        elif weekDay:
+            result = await github.filter(asa_id= asaID).\
+            filter(last_push_date__range= [startDate, endDate]).\
+            annotate(stars= Sum("no_of_stars"), forks= Sum("no_of_forks"), watches= Sum("no_of_watches"),
+            commits= Sum("no_of_commits"), issues= Sum("issues"), pull_requests= Sum("pull_requests")).\
+            group_by("weekday").\
+            values("weekday", "stars", "forks", "commits", "issues", "pull_requests", "watches") 
+
+        elif day:
+            result = await github.filter(asa_id= asaID).\
+            filter(last_push_date__range= [startDate, endDate]).\
+            annotate(stars= Sum("no_of_stars"), forks= Sum("no_of_forks"), watches= Sum("no_of_watches"),
+            commits= Sum("no_of_commits"), issues= Sum("issues"), pull_requests= Sum("pull_requests")).\
+            group_by("dow").\
+            values("dow", "stars", "forks", "commits", "issues", "pull_requests", "watches") 
+        
+        else:
+            result = await github.filter(asa_id= asaID).filter(last_push_date__range= [startDate, endDate]).\
+            annotate(stars= Sum("no_of_stars"), forks= Sum("no_of_forks"), watches= Sum("no_of_watches"),
+            commits= Sum("no_of_commits"), issues= Sum("issues"), pull_requests= Sum("pull_requests")).\
+            group_by("last_push_date").\
+            values("last_push_date", "stars", "forks", "commits", "issues", "pull_requests", "watches") 
+
+        print(result)
+        result= [from_dict(data_class= GithubAnalyticsPerTime, data=x)for x in result]
+        return PerTime(
+            repo= result
+            )
+        
+        
+schema = strawberry.Schema(query=Query)
