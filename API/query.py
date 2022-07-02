@@ -7,12 +7,11 @@ from pandas import timedelta_range
 import datetime
 from tortoise.functions import Sum
 from dacite import from_dict #to simply creation of dataclasses from dictionaries.
-from models import github
-from api.github import PerRepo, PerTime, GithubAnalyticsPerTime, GithubOverview, GithubAnalyticsPerRepo
+from models import Github
+from github import PerRepo, PerTime, GithubAnalyticsPerTime, GithubOverview, GithubAnalyticsPerRepo
 from typing import List, Union
 from urllib import response
 from fastapi import status, HTTPException
-import strawberry
 from models import Twitter
 from twitter import  TwitterAnalytics, TwitterOverview, response
 from tortoise.functions import Avg, Count, Sum
@@ -34,9 +33,6 @@ class Query:
     @strawberry.field 
     async def twitterOverview(self, asaID:str) -> TwitterOverview:
         result = await Twitter.filter(asa_id=asaID).values()
-        # print(result)
-        # print(result['asa_id'])
-        # print(len(result['tweet']))
         result = {key: [i[key] for i in result] for key in result[0]}
         result = AttrDict(result)
 
@@ -50,13 +46,10 @@ class Query:
 
     @strawberry.field
     async def twitterAnalytics(self, asaID:str, startDate:str = '2021-03-01', endDate:str = '2021-03-21', weekday: bool=False, hour: bool=False) -> response:
-        
         if weekday and hour:
-
             raise Exception("Error! Analyze weekday or hour")
 
         if weekday:
-            
             result = await Twitter.\
                 filter(asa_id = asaID).\
                 filter(posted_at__range = [startDate, endDate]).\
@@ -64,8 +57,6 @@ class Query:
                 sentiment = Sum("sentiment_score")).\
                 group_by("dow").\
                 values("dow", "likes", "retweets", "sentiment")
-
-            
 
         if hour:
             result = await Twitter.\
@@ -75,8 +66,6 @@ class Query:
                 sentiment = Sum("sentiment_score")).\
                 group_by("hour").\
                 values("hour", "likes", "retweets", "sentiment")
-            
-
 
         if ((hour == False) & (weekday == False)):
             result = await Twitter.filter(asa_id = asaID).filter(posted_at__range = [startDate, endDate]).\
@@ -84,20 +73,12 @@ class Query:
                 group_by("posted_at").\
                 values("posted_at", "likes", "retweets", "sentiment")
 
-        # result = {key: [i[key] for i in result] for key in result[0]}
 
         result = [from_dict(data_class=TwitterAnalytics, data=x) for x in result]
-        print(result)
         
         return response(
                 asaID = asaID,
                 results = result
-            
-            
-            # hour = result['hour'],
-            # weekday = result['dow']
-            
-
         )
 
 
@@ -158,8 +139,6 @@ class Query:
         return [reddit_table_to_json(post_data) for post_data in post_table]
 
 
-@strawberry.type
-class Query:
     @strawberry.field
     async def github_overview(self, asaID: str) -> GithubOverview:
         """
@@ -168,7 +147,7 @@ class Query:
         params : asaID
         returns : GithubOverview Schema
         """
-        result = await github.filter(asa_id= asaID).values()
+        result = await Github.filter(asa_id= asaID).values()
         result= AttrDict({key: [i[key] for i in result] for key in result[0]})
 
         return GithubOverview(
@@ -196,7 +175,7 @@ class Query:
                       - Ordering by the specified `sortBy` params value.
         returns:      PerRepo Schema - the JSON representation of each github activity as needed by the client.
         """
-        result= await github.filter(asa_id= asaID).\
+        result= await Github.filter(asa_id= asaID).\
             annotate(stars=Sum("no_of_stars"), forks=Sum("no_of_forks"),
             contributors= Sum("no_of_contributors"), commits= Sum("no_of_commits"),
             issues= Sum("issues"), pull_requests= Sum("pull_requests")).\
@@ -229,7 +208,7 @@ class Query:
             raise Exception("Error! Analyze Weekday or Day")
             
         elif weekDay:
-            result = await github.filter(asa_id= asaID).\
+            result = await Github.filter(asa_id= asaID).\
             filter(last_push_date__range= [startDate, endDate]).\
             annotate(stars= Sum("no_of_stars"), forks= Sum("no_of_forks"), watches= Sum("no_of_watches"),
             commits= Sum("no_of_commits"), issues= Sum("issues"), pull_requests= Sum("pull_requests")).\
@@ -237,7 +216,7 @@ class Query:
             values("weekday", "stars", "forks", "commits", "issues", "pull_requests", "watches") 
 
         elif day:
-            result = await github.filter(asa_id= asaID).\
+            result = await Github.filter(asa_id= asaID).\
             filter(last_push_date__range= [startDate, endDate]).\
             annotate(stars= Sum("no_of_stars"), forks= Sum("no_of_forks"), watches= Sum("no_of_watches"),
             commits= Sum("no_of_commits"), issues= Sum("issues"), pull_requests= Sum("pull_requests")).\
@@ -245,7 +224,7 @@ class Query:
             values("dow", "stars", "forks", "commits", "issues", "pull_requests", "watches") 
         
         else:
-            result = await github.filter(asa_id= asaID).filter(last_push_date__range= [startDate, endDate]).\
+            result = await Github.filter(asa_id= asaID).filter(last_push_date__range= [startDate, endDate]).\
             annotate(stars= Sum("no_of_stars"), forks= Sum("no_of_forks"), watches= Sum("no_of_watches"),
             commits= Sum("no_of_commits"), issues= Sum("issues"), pull_requests= Sum("pull_requests")).\
             group_by("last_push_date").\
