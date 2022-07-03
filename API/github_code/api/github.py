@@ -23,7 +23,7 @@ class GithubAnalyticsPerTime:
     pull_requests: int
     issues: int
     watches:int
-    lp_day_of_week: Union[int, None]
+    lp_day_of_week: Union[str, None]
     lp_day: Union[int, None]
     last_push_date: Union[datetime.datetime, None]
 
