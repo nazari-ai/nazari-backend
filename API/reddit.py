@@ -8,6 +8,7 @@ class RedditPostSchema:
     post_id: str
     post_title: str
     post_text: str
+    num_of_comments: int
     score: int
     sentimentScore: float
     more: List["RedditCommentSchema"]
