@@ -4,7 +4,7 @@ from api.query import schema
 from tortoise.contrib.fastapi import register_tortoise
 
 app = FastAPI()
-DATABASE_URL= "postgres://postgres:precillieo@127.0.0.1:5432/test"
+DATABASE_URL= "postgres://postgres:precillieo@127.0.0.1:5432/new_db"
 
 graphql_app= GraphQL(schema)
 app.add_route('/dashboard', graphql_app)

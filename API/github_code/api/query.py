@@ -96,16 +96,16 @@ class Query:
             filter(last_push_date__range= [startDate, endDate]).\
             annotate(stars= Sum("no_of_stars"), forks= Sum("no_of_forks"), watches= Sum("no_of_watches"),
             commits= Sum("no_of_commits"), issues= Sum("issues"), pull_requests= Sum("pull_requests")).\
-            group_by("weekday").\
-            values("weekday", "stars", "forks", "commits", "issues", "pull_requests", "watches") 
+            group_by("lp_day_of_week").\
+            values("lp_day_of_week", "stars", "forks", "commits", "issues", "pull_requests", "watches") 
 
         elif day:
             result = await github.filter(asa_id= asaID).\
             filter(last_push_date__range= [startDate, endDate]).\
             annotate(stars= Sum("no_of_stars"), forks= Sum("no_of_forks"), watches= Sum("no_of_watches"),
             commits= Sum("no_of_commits"), issues= Sum("issues"), pull_requests= Sum("pull_requests")).\
-            group_by("dow").\
-            values("dow", "stars", "forks", "commits", "issues", "pull_requests", "watches") 
+            group_by("lp_day").\
+            values("lp_day", "stars", "forks", "commits", "issues", "pull_requests", "watches") 
         
         else:
             result = await github.filter(asa_id= asaID).filter(last_push_date__range= [startDate, endDate]).\
