@@ -11,7 +11,7 @@ from dacite import from_dict  # to simply creation of dataclasses from dictionar
 
 from models import Twitter, RedditPostTable, RedditCommentTable, Github, Github_Pydantic
 from reddit import RedditPostSchema, RedditCommentSchema
-from twitter import TwitterAnalytics, TwitterOverview, response
+from twitter import TwitterAnalytics, TwitterOverview, Response
 from github import (
     PerRepo,
     PerTime,
@@ -37,7 +37,16 @@ class AttrDict(dict):
 class Query:
     @strawberry.field
     async def twitterOverview(self, asaID: str) -> TwitterOverview:
+
+        """
+        Resolver to generate summary overview for all twitter posts of a given ASA.
+        params
+            asaID
+        returns
+            List[TwitterOverview]
+        """
         result = await Twitter.filter(asa_id=asaID).values()
+
         result = {key: [i[key] for i in result] for key in result[0]}
         result = AttrDict(result)
 
@@ -53,11 +62,23 @@ class Query:
     async def twitterAnalytics(
         self,
         asaID: str,
-        startDate: str = "2021-03-01",
-        endDate: str = "2021-03-21",
+        startDate: str = "2022-06-25",  # to be modified to datetime.now
+        endDate: str = "2022-07-02",  # to be modified to timedelta
         weekday: bool = False,
         hour: bool = False,
-    ) -> response:
+    ) -> Response:
+        """
+        Resolver to generate Twitter analytics for an ASA depending on parameters.
+        params
+            asaID
+            startDate   default = datetime.datetime.now
+            endDate     default = datetime.datetime.now - datetime.timedelta(7)
+            weeekday    default = False
+            hour        default = False
+        returns
+            List[Response]
+        """
+
         if weekday and hour:
             raise Exception("Error! Analyze weekday or hour")
 
@@ -70,8 +91,8 @@ class Query:
                     retweets=Sum("retweets"),
                     sentiment=Sum("sentiment_score"),
                 )
-                .group_by("dow")
-                .values("dow", "likes", "retweets", "sentiment")
+                .group_by("day_of_week")
+                .values("day_of_week", "likes", "retweets", "sentiment")
             )
 
         if hour:
@@ -99,10 +120,8 @@ class Query:
                 .group_by("posted_at")
                 .values("posted_at", "likes", "retweets", "sentiment")
             )
-
         result = [from_dict(data_class=TwitterAnalytics, data=x) for x in result]
-
-        return response(asaID=asaID, results=result)
+        return Response(asaID=asaID, results=result)
 
     @strawberry.field
     async def redditAnalytics(
@@ -119,7 +138,6 @@ class Query:
         returns
             List[RedditPostSchema]
         """
-
         post_table = (
             await RedditPostTable.filter(asa_id=asaID)
             # .filter(time_created__range=[startDate, endDate])
@@ -217,7 +235,6 @@ class Query:
                 "pull_requests",
             )
         )
-
         result = [from_dict(data_class=GithubAnalyticsPerRepo, data=x) for x in result]
         return PerRepo(repo=result)
 
