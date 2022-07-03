@@ -14,15 +14,15 @@ app.add_route("/analytics", graphql_app)
 app.add_websocket_route("/analytics", graphql_app)
 
 
-DATABASE_URL = "postgres://postgres:myPassword@127.0.0.1:5432/asalyticsdb"
+DATABASE_URL = "postgres://postgres:myPassword@127.0.0.1:5432/test_db"
 
 
 register_tortoise(
     app,
-    db_url = DATABASE_URL,
-    modules = {'models': ['models']},
-    generate_schemas = True,
-    add_exception_handlers = True,
+    db_url=DATABASE_URL,
+    modules={"models": ["models"]},
+    generate_schemas=True,
+    add_exception_handlers=True,
 )
 
 TORTOISE_ORM = {
