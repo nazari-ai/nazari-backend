@@ -1,0 +1,4 @@
+*pycache*
+venv/
+migrations/
+pyproject.toml
