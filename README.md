@@ -66,3 +66,7 @@ List of contriubutors:
 -   [Steven Kolawole](https://www.linkedin.com/in/steven-kolawole-80/)
 -   [Ernest Owojori](https://www.linkedin.com/in/owojori-ernest-tolulope-734bb1170/)
 -   [Precious Kolawole](https://www.precillieo.com/)
+
+## Milestone Demo
+
+The video demo can be found [here](https://drive.google.com/file/d/1YB29KN_2_gvUjdSOJGphmZDIbqFVp1iW/view?usp=sharing)
