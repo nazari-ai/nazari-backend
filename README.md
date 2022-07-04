@@ -49,7 +49,10 @@ uvicorn --reload main:app
 Open [http://localhost:8000](http://localhost:8000) with your browser to see the result.
 
 ## Screenshots
-@Steven Kindly attach here
+![image](https://user-images.githubusercontent.com/45284829/177061780-4921c3e1-6ee5-4908-b14b-439f6fd52653.png)
+
+![image](https://user-images.githubusercontent.com/45284829/177061821-32efe656-2271-4b3a-a046-da4df6362b76.png)
+
 
 ## Status
 
