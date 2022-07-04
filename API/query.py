@@ -1,3 +1,4 @@
+from tracemalloc import start
 import strawberry
 from fastapi import status, HTTPException
 from tortoise.functions import Sum, Avg, Count
@@ -62,8 +63,8 @@ class Query:
     async def twitterAnalytics(
         self,
         asaID: str,
-        startDate: str = "2022-06-25",  # to be modified to datetime.now
-        endDate: str = "2022-07-02",  # to be modified to timedelta
+        startDate: str = startDate,
+        endDate: str = endDate,
         weekday: bool = False,
         hour: bool = False,
     ) -> Response:
@@ -125,10 +126,7 @@ class Query:
 
     @strawberry.field
     async def redditAnalytics(
-        self,
-        asaID: str,
-        # startDate: str = "2022-04-28",  # to be modified into datetime.now() in production
-        # endDate: str = "2021-02-22",  # to be modified using timedelta of 7 days
+        self, asaID: str, startDate: str = startDate, endDate: str = endDate
     ) -> List[RedditPostSchema]:
         """Resolver to generate a list of reddit posts with each post's comments nested in the schema.
         params
@@ -140,7 +138,7 @@ class Query:
         """
         post_table = (
             await RedditPostTable.filter(asa_id=asaID)
-            # .filter(time_created__range=[startDate, endDate])
+            .filter(time_created__range=[startDate, endDate])
             .values()
         )
 
