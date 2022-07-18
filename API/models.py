@@ -1,6 +1,5 @@
 from tortoise.models import Model
 from tortoise import fields
-from tortoise.contrib.pydantic import pydantic_model_creator
 
 
 class Twitter(Model):
@@ -29,12 +28,6 @@ class Twitter(Model):
         exclude = ["asa_id"]
 
 
-Twitter_Pydantic = pydantic_model_creator(
-    Twitter,
-    name="twitterPydantic",
-)
-
-
 class RedditPostTable(Model):
     post_id = fields.CharField(pk=True, max_length=255)
     title = fields.TextField()
@@ -59,12 +52,6 @@ class RedditPostTable(Model):
         exclude = ["asa_id"]
 
 
-Post_Pydantic = pydantic_model_creator(
-    RedditPostTable,
-    name="postsPydantic",
-)
-
-
 class RedditCommentTable(Model):
     comment_id = fields.CharField(pk=True, max_length=255)
     body = fields.TextField()
@@ -81,12 +68,6 @@ class RedditCommentTable(Model):
 
     class Meta:
         table = "redditCommentTable"
-
-
-Comment_Pydantic = pydantic_model_creator(
-    RedditCommentTable,
-    name="commentsPydantic",
-)
 
 
 class Github(Model):
@@ -121,9 +102,3 @@ class Github(Model):
 
     class PydanticMeta:
         exclude = ["asa_id"]
-
-
-Github_Pydantic = pydantic_model_creator(
-    Github,
-    name="githubPydantic",
-)

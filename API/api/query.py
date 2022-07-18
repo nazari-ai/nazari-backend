@@ -1,24 +1,26 @@
 from tracemalloc import start
 import strawberry
-from fastapi import status, HTTPException
-from tortoise.functions import Sum, Avg, Count
+from tortoise.functions import Sum
 
 import datetime
-from urllib import response
-from typing import List, Union
-from pandas import timedelta_range
-from typing import List, Dict, Any
+from typing import List
+
+# from pandas import timedelta_range
+from typing import List, Optional
 from dacite import from_dict  # to simply creation of dataclasses from dictionaries.
 
-from models import Twitter, RedditPostTable, RedditCommentTable, Github, Github_Pydantic
-from reddit import RedditPostSchema, RedditCommentSchema
-from twitter import TwitterAnalytics, TwitterOverview, Response
-from github import (
-    PerRepo,
-    PerTime,
-    GithubAnalyticsPerTime,
+from models import Twitter, RedditPostTable, RedditCommentTable, Github
+from . import (
+    TwitterAnalytics,
+    TwitterOverview,
+    Response,
     GithubOverview,
     GithubAnalyticsPerRepo,
+    GithubAnalyticsPerTime,
+    RedditPostSchema,
+    RedditCommentSchema,
+    PerRepo,
+    PerTime,
 )
 
 
@@ -26,12 +28,6 @@ endDate = datetime.datetime.utcnow()  # contains the current local date and time
 startDate = endDate - datetime.timedelta(
     days=7
 )  # contains 7 days from the current date and time
-
-
-class AttrDict(dict):
-    def __init__(self, *args, **kwargs):
-        super(AttrDict, self).__init__(*args, **kwargs)
-        self.__dict__ = self
 
 
 @strawberry.type
@@ -46,13 +42,15 @@ class Query:
         returns
             List[TwitterOverview]
         """
-        result = await Twitter.filter(asa_id=asaID).values()
+        result = await Twitter.filter(asa_id=asaID).values(
+            "sentiment_score", "retweets", "likes", "tweet"
+        )
 
         result = {key: [i[key] for i in result] for key in result[0]}
-        result = AttrDict(result)
+        # result = [from_dict(data_class=TwitterOverview, data=x) for x in result]
 
         return TwitterOverview(
-            asaID=result["asa_id"][0],
+            asaID=asaID,
             tweetTotal=len(result["tweet"]),
             likeTotal=sum(result["likes"]),
             retweetTotal=sum(result["retweets"]),
@@ -63,8 +61,8 @@ class Query:
     async def twitterAnalytics(
         self,
         asaID: str,
-        startDate: str = startDate,
-        endDate: str = endDate,
+        startDate: Optional[str] = startDate,
+        endDate: Optional[str] = endDate,
         weekday: bool = False,
         hour: bool = False,
     ) -> Response:
@@ -106,7 +104,12 @@ class Query:
                     sentiment=Sum("sentiment_score"),
                 )
                 .group_by("hour")
-                .values("hour", "likes", "retweets", "sentiment")
+                .values(
+                    "hour",
+                    "likes",
+                    "retweets",
+                    "sentiment",
+                )
             )
 
         if (hour == False) & (weekday == False):
@@ -185,17 +188,17 @@ class Query:
         returns : GithubOverview Schema
         """
         result = await Github.filter(asa_id=asaID).values()
-        result = AttrDict({key: [i[key] for i in result] for key in result[0]})
+        result = {key: [i[key] for i in result] for key in result[0]}
 
         return GithubOverview(
-            commits=sum(result.no_of_commits),
-            forks=sum(result.no_of_forks),
-            stars=sum(result.no_of_stars),
-            contributors=sum(result.no_of_contributors),
-            pull_requests=sum(result.pull_requests),
-            issues=sum(result.issues),
-            watches=sum(result.no_of_watches),
-            languages=result.language,
+            commits=sum(result["no_of_commits"]),
+            forks=sum(result["no_of_forks"]),
+            stars=sum(result["no_of_stars"]),
+            contributors=sum(result["no_of_contributors"]),
+            pull_requests=sum(result["pull_requests"]),
+            issues=sum(result["issues"]),
+            watches=sum(result["no_of_watches"]),
+            languages=result["language"],
         )
 
     @strawberry.field
@@ -240,8 +243,8 @@ class Query:
     async def github_analytics_pertime(
         self,
         asaID: str,
-        endDate: str = endDate,
-        startDate: str = startDate,
+        endDate: Optional[str] = endDate,
+        startDate: Optional[str] = startDate,
         day: bool = False,
         weekDay: bool = False,
     ) -> PerTime:
@@ -334,7 +337,6 @@ class Query:
                 )
             )
 
-        print(result)
         result = [from_dict(data_class=GithubAnalyticsPerTime, data=x) for x in result]
         return PerTime(repo=result)
 

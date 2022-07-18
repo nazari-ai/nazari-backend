@@ -1,7 +1,6 @@
 import strawberry
-from typing import List, Optional, Union
+from typing import List, Union
 import datetime
-from strawberry.scalars import JSON
 
 
 @strawberry.type
