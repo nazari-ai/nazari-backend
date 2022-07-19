@@ -1,8 +1,6 @@
-from typing import Any, Dict, List, Mapping, Union
-from pyparsing import Optional
+from typing import List, Union
 import strawberry
 from datetime import datetime
-from strawberry.scalars import JSON
 
 
 @strawberry.type
