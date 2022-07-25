@@ -1,4 +1,3 @@
-import uvicorn
 from tortoise.contrib.fastapi import register_tortoise
 from fastapi import FastAPI
 from strawberry.asgi import GraphQL
@@ -42,6 +41,3 @@ init(app)
 graphql_app = GraphQL(schema)
 app.add_route("/analytics", graphql_app)
 app.add_websocket_route("/analytics", graphql_app)
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)

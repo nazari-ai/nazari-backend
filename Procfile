@@ -1,3 +1,1 @@
-web: python API/main.py
-
-worker: python API/main.py
+gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker
