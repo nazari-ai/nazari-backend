@@ -47,7 +47,6 @@ class Query:
         )
 
         result = {key: [i[key] for i in result] for key in result[0]}
-        # result = [from_dict(data_class=TwitterOverview, data=x) for x in result]
 
         return TwitterOverview(
             asaID=asaID,
