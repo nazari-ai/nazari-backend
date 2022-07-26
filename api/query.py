@@ -1,4 +1,3 @@
-from tracemalloc import start
 import strawberry
 from tortoise.functions import Sum
 
