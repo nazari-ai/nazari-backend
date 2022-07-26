@@ -1,10 +1,10 @@
+import os
 from tortoise.contrib.fastapi import register_tortoise
 from fastapi import FastAPI
 from strawberry.asgi import GraphQL
 from api.query import schema
 
-
-DATABASE_URL = "postgres://postgres:password@127.0.0.1:5432/test_set"
+DATABASE_URL = os.environ["DATABASE_URL"]
 
 
 def init(app: FastAPI):
