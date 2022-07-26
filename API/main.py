@@ -1,3 +1,4 @@
+import uvicorn
 from tortoise.contrib.fastapi import register_tortoise
 from fastapi import FastAPI
 from strawberry.asgi import GraphQL
@@ -33,18 +34,7 @@ TORTOISE_ORM = {
             "default_connection": "default",
         }
     },
-    # "_create_db": True,
 }
-
-# register_tortoise(
-#     app,
-#     config=TORTOISE_ORM,
-#     #     db_url=DATABASE_URL,
-#     #     modules={"models": ["models"]},
-#     #     generate_schemas=True,
-#     #     add_exception_handlers=True
-# )
-
 app = FastAPI()
 
 init(app)
@@ -52,3 +42,6 @@ init(app)
 graphql_app = GraphQL(schema)
 app.add_route("/analytics", graphql_app)
 app.add_websocket_route("/analytics", graphql_app)
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
