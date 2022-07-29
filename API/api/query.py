@@ -9,7 +9,7 @@ from typing import List
 from typing import List, Optional
 from dacite import from_dict  # to simply creation of dataclasses from dictionaries.
 
-from models import Twitter, RedditPostTable, RedditCommentTable, Github
+from models import Twitter, RedditPostTable, RedditCommentTable, Github, ASA
 from . import (
     TwitterAnalytics,
     TwitterOverview,
@@ -21,6 +21,7 @@ from . import (
     RedditCommentSchema,
     PerRepo,
     PerTime,
+    ASAData
 )
 
 
@@ -32,6 +33,10 @@ startDate = endDate - datetime.timedelta(
 
 @strawberry.type
 class Query:
+    @strawberry.field
+    async def asa_data(self) -> List[ASAData]:
+        pass
+
     @strawberry.field
     async def twitterOverview(self, asaID: str) -> TwitterOverview:
 

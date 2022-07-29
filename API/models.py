@@ -2,6 +2,37 @@ from tortoise.models import Model
 from tortoise import fields
 
 
+class ASA(Model):
+    """
+    ASA List & Descriptions
+    """
+    asset_id= fields.CharField(pk=True, max_length= 255)
+    name= fields.CharField(max_length= 255)
+    logo= name= fields.CharField(max_length= 255)
+    unitname_1= fields.CharField(max_length= 255)
+    unitname_2= fields.CharField(max_length= 255)
+    reputation__pera= fields.CharField(max_length= 255)
+    reputation__algoexplorer= fields.CharField(max_length= 255)
+    score__algoexplorer= fields.IntField()
+    description= fields.TextField()
+    URL= name= fields.CharField(max_length= 255)
+    usd_value= fields.FloatField()
+    fraction_decimals= fields.IntField()
+    total_supply= fields.CharField(max_length= 255)
+    circ_supply=fields.CharField(max_length= 255)
+    creator= fields.CharField(max_length= 255)
+    category= fields.CharField(max_length= 255)
+    twitter= fields.CharField(max_length= 255)
+    telegram= fields.CharField(max_length= 255)
+    discord= fields.CharField(max_length= 255)
+    medium= fields.CharField(max_length= 255)
+    reddit= fields.CharField(max_length= 255)
+    github= fields.CharField(max_length= 255)
+
+    class Meta:
+        table= "asaTable"
+    
+
 class Twitter(Model):
     """
     Twitter model
