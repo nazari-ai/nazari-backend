@@ -14,9 +14,8 @@ class TwitterOverview:
 
 @strawberry.type
 class TwitterAnalytics:
-    # asaID: Union[str, None]
     posted_at: Union[datetime, None]
-    day_of_week: Union[int, None]
+    weekday: Union[str, None]
     hour: Union[int, None]
     likes: int
     retweets: int

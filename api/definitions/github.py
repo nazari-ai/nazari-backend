@@ -1,11 +1,11 @@
 import strawberry
-from typing import List, Union
+from typing import List, Union, Set
 import datetime
 
 
 @strawberry.type
 class GithubOverview:
-    languages: List[str]
+    languages: List[Union[str, None]]
     commits: int
     forks: int
     stars: int
@@ -23,8 +23,8 @@ class GithubAnalyticsPerTime:
     pull_requests: int
     issues: int
     watches: int
-    lp_day_of_week: Union[str, None]
-    lp_day: Union[int, None]
+    last_push_date_weekday: Union[str, None]
+    last_push_date_day: Union[int, None]
     last_push_date: Union[datetime.datetime, None]
 
 
@@ -36,6 +36,7 @@ class GithubAnalyticsPerRepo:
     contributors: int
     pull_requests: int
     issues: int
+    watches: int
     repo_name: str
 
 

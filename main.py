@@ -5,7 +5,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from strawberry.asgi import GraphQL
 from api.query import schema
 
-DATABASE_URL = os.environ["DATABASE_URL"]
+# DATABASE_URL = os.environ["DATABASE_URL"]
+DATABASE_URL = "postgres://postgres:password@127.0.0.1:5432/mock_v2"
 
 
 def init(app: FastAPI):
