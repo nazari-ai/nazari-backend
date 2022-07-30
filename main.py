@@ -1,11 +1,11 @@
-import uvicorn
+import os
 from tortoise.contrib.fastapi import register_tortoise
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from strawberry.asgi import GraphQL
 from api.query import schema
 
-
-DATABASE_URL = "postgres://postgres:password@127.0.0.1:5432/test_set"
+DATABASE_URL = os.environ["DATABASE_URL"]
 
 
 def init(app: FastAPI):
@@ -37,11 +37,19 @@ TORTOISE_ORM = {
 }
 app = FastAPI()
 
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 init(app)
 
 graphql_app = GraphQL(schema)
 app.add_route("/analytics", graphql_app)
 app.add_websocket_route("/analytics", graphql_app)
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 import strawberry
 
 
@@ -7,7 +7,7 @@ class RedditPostSchema:
     asaID: str
     post_id: str
     post_title: str
-    post_text: str
+    post_text: Union[str, None]
     num_of_comments: int
     score: int
     sentimentScore: float

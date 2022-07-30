@@ -1,4 +1,3 @@
-from tracemalloc import start
 import strawberry
 from tortoise.functions import Sum
 
@@ -43,14 +42,16 @@ class Query:
             List[TwitterOverview]
         """
         result = await Twitter.filter(asa_id=asaID).values(
-            "sentiment_score", "retweets", "likes", "tweet"
+            "sentiment_score", "retweets", "likes", "text"
         )
 
+        if not result:
+            raise Exception("Error! ASA not found!")
         result = {key: [i[key] for i in result] for key in result[0]}
 
         return TwitterOverview(
             asaID=asaID,
-            tweetTotal=len(result["tweet"]),
+            tweetTotal=len(result["text"]),
             likeTotal=sum(result["likes"]),
             retweetTotal=sum(result["retweets"]),
             sentimentTotal=sum(result["sentiment_score"]),
@@ -89,8 +90,8 @@ class Query:
                     retweets=Sum("retweets"),
                     sentiment=Sum("sentiment_score"),
                 )
-                .group_by("day_of_week")
-                .values("day_of_week", "likes", "retweets", "sentiment")
+                .group_by("weekday")
+                .values("weekday", "likes", "retweets", "sentiment")
             )
 
         if hour:
@@ -144,6 +145,9 @@ class Query:
             .values()
         )
 
+        if not post_table:
+            raise Exception("Error! ASA not found!")
+
         async def reddit_table_to_json(post_data: RedditPostTable) -> RedditPostSchema:
             """Function to retrieve the JSON representation of each reddit post and its comments.
             params
@@ -168,8 +172,8 @@ class Query:
                 asaID=post_data["asa_id"],
                 post_id=post_data["post_id"],
                 post_title=post_data["title"],
-                post_text=post_data["text"],
-                num_of_comments=post_data["num_of_comments"],
+                post_text=post_data["post_text"],
+                num_of_comments=post_data["total_comments"],
                 score=post_data["score"],
                 sentimentScore=post_data["sentiment_score"],
                 more=comment_data,
@@ -187,6 +191,9 @@ class Query:
         returns : GithubOverview Schema
         """
         result = await Github.filter(asa_id=asaID).values()
+        if not result:
+            raise Exception("Error! ASA not found!")
+
         result = {key: [i[key] for i in result] for key in result[0]}
 
         return GithubOverview(
@@ -196,8 +203,8 @@ class Query:
             contributors=sum(result["no_of_contributors"]),
             pull_requests=sum(result["pull_requests"]),
             issues=sum(result["issues"]),
-            watches=sum(result["no_of_watches"]),
-            languages=result["language"],
+            watches=sum(result["no_of_watchers"]),
+            languages=set(result["language"]),
         )
 
     @strawberry.field
@@ -222,6 +229,7 @@ class Query:
                 commits=Sum("no_of_commits"),
                 issues=Sum("issues"),
                 pull_requests=Sum("pull_requests"),
+                watches=Sum("no_of_watchers"),
             )
             .group_by("repo_name")
             .order_by("-" + str(sortBy))
@@ -233,6 +241,7 @@ class Query:
                 "commits",
                 "issues",
                 "pull_requests",
+                "watches",
             )
         )
         result = [from_dict(data_class=GithubAnalyticsPerRepo, data=x) for x in result]
@@ -271,14 +280,14 @@ class Query:
                 .annotate(
                     stars=Sum("no_of_stars"),
                     forks=Sum("no_of_forks"),
-                    watches=Sum("no_of_watches"),
+                    watches=Sum("no_of_watchers"),
                     commits=Sum("no_of_commits"),
                     issues=Sum("issues"),
                     pull_requests=Sum("pull_requests"),
                 )
-                .group_by("lp_day_of_week")
+                .group_by("last_push_date_weekday")
                 .values(
-                    "lp_day_of_week",
+                    "last_push_date_weekday",
                     "stars",
                     "forks",
                     "commits",
@@ -295,14 +304,14 @@ class Query:
                 .annotate(
                     stars=Sum("no_of_stars"),
                     forks=Sum("no_of_forks"),
-                    watches=Sum("no_of_watches"),
+                    watches=Sum("no_of_watchers"),
                     commits=Sum("no_of_commits"),
                     issues=Sum("issues"),
                     pull_requests=Sum("pull_requests"),
                 )
-                .group_by("lp_day")
+                .group_by("last_push_date_day")
                 .values(
-                    "lp_day",
+                    "last_push_date_day",
                     "stars",
                     "forks",
                     "commits",
@@ -319,7 +328,7 @@ class Query:
                 .annotate(
                     stars=Sum("no_of_stars"),
                     forks=Sum("no_of_forks"),
-                    watches=Sum("no_of_watches"),
+                    watches=Sum("no_of_watchers"),
                     commits=Sum("no_of_commits"),
                     issues=Sum("issues"),
                     pull_requests=Sum("pull_requests"),

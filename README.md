@@ -25,19 +25,13 @@ Other secondary technologies used on this project includes:
 
 ### Install dependencies
 ```bash
-pip install fastapi
+pip install pipenv
 ```
 ```bash
-pip install tortoise-orm
+cd projectFolder
 ```
 ```bash
-pip install 'strawberry-graphql[debug-server]'
-```
-```bash
-pip install uvicorn[standard]
-```
-```bash
-pip install asyncpg
+pipenv install
 ```
 
 ### After, run the development server:
