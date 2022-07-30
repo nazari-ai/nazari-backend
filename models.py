@@ -139,3 +139,41 @@ Github_Pydantic = pydantic_model_creator(
     Github,
     name="githubPydantic",
 )
+
+
+class AssetTable(Model):
+
+    asset_id = fields.CharField(pk=True, max_length=255)
+    name = fields.CharField(max_length=255)
+    logo = fields.TextField(null=True)
+    unitname_1 = fields.CharField(max_length=255, null=True)
+    unitname_2 = fields.CharField(max_length=255, null=True)
+    reputation__pera = fields.CharField(max_length=255, null=True)
+    reputation__algoexplorer = fields.CharField(max_length=255, null=True)
+    score__algoexplorer = fields.IntField(null=True)
+    description = fields.TextField(null=True)
+    URL = fields.CharField(max_length=255)
+    usd_value = fields.CharField(null=True, max_length=255)
+    fraction_decimals = fields.IntField(null=True)
+    total_supply = fields.CharField(null=True, max_length=255)
+    circ_supply = fields.CharField(null=True, max_length=255)
+    creator = fields.CharField(max_length=255, null=True)
+    category = fields.TextField(null=True)
+    twitter = fields.CharField(max_length=255, null=True)
+    telegram = fields.CharField(max_length=255, null=True)
+    discord = fields.CharField(max_length=255, null=True)
+    medium = fields.CharField(max_length=255, null=True)
+    reddit = fields.CharField(max_length=255, null=True)
+    github = fields.CharField(max_length=255, null=True)
+
+    class Meta:
+        table = "assetTable"
+
+    class PydanticMeta:
+        exclude = ["asset_id"]
+
+
+Asset_Pydantic = pydantic_model_creator(
+    AssetTable,
+    name="assetPydantic",
+)
