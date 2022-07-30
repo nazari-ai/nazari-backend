@@ -9,7 +9,7 @@ from typing import List
 from typing import List, Optional
 from dacite import from_dict  # to simply creation of dataclasses from dictionaries.
 
-from models import Twitter, RedditPostTable, RedditCommentTable, Github, ASA
+from models import Twitter, RedditPostTable, RedditCommentTable, Github, Asa
 from . import (
     TwitterAnalytics,
     TwitterOverview,
@@ -21,7 +21,7 @@ from . import (
     RedditCommentSchema,
     PerRepo,
     PerTime,
-    ASAData
+    AsaData
 )
 
 
@@ -34,8 +34,45 @@ startDate = endDate - datetime.timedelta(
 @strawberry.type
 class Query:
     @strawberry.field
-    async def asa_data(self) -> List[ASAData]:
-        pass
+    async def asaData(self, asaID: str) -> AsaData:
+        """
+        Resolver for asa details needed across pera and algoexplorer
+        params
+            asaID
+        returns
+            List[TwitterOverview]
+        """
+
+        result = await Asa.filter(asset_id = asaID).values()
+        result = {key: [i[key] for i in result] for key in result[0]}
+
+        
+
+        return AsaData(
+            asset_id = result['asset_id'],
+            name = result['name'],
+            logo = result['logo'],
+            unitname_1 = result['unitname_1'],
+            unitname_2 = result['unitname_2'],
+            reputation_pera = result['reputation__pera'],
+            reputation_algoexplorer = result['reputation__algoexplorer'],
+            score_algoexplorer = result['score__algoexplorer'],
+            description = result['description'],
+            URL = result['URL'],
+            usd_value = result['usd_value'],
+            fraction_decimals = result['fraction_decimals'],
+            total_supply = result['total_supply'],
+            circ_supply = result['circ_supply'],
+            creator = result['creator'],
+            category = result['category'],
+            twitter = result['twitter'],
+            telegram = result['telegram'],
+            discord = result['discord'],
+            medium = result['medium'],
+            reddit = result['reddit'],
+            github = result['github']
+
+        )
 
     @strawberry.field
     async def twitterOverview(self, asaID: str) -> TwitterOverview:
