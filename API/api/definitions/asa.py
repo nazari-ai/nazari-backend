@@ -4,28 +4,28 @@ import datetime
 
 @strawberry.type
 class AsaData:
-    asset_id:str
+    asset_id:List[str]
     name:Union[List[str], None]
-    logo:str
-    unitname_1:str
-    unitname_2:str
-    reputation_pera:str
-    reputation_algoexplorer:str
-    score_algoexplorer:int
-    description:str
+    logo:List[str]
+    unitname_1:List[str]
+    unitname_2:List[str]
+    reputation_pera:List[str]
+    reputation_algoexplorer:List[str]
+    score_algoexplorer:List[int]
+    description:List[str]
     URL:List[str]
-    usd_value: float
-    fraction_decimals:str
-    total_supply:int
-    circ_supply: int
+    usd_value: List[float]
+    fraction_decimals:List[int]
+    total_supply:List[str]
+    circ_supply: List[str]
     category:List[str]
-    creator:str
+    creator:List[str]
     twitter:Union[List[str], None]
     telegram:Union[List[str], None]
     discord:Union[List[str], None]
-    medium:str
-    reddit:str
-    github:str
+    medium:List[str]
+    reddit:List[str]
+    github:List[str]
 
 
 
