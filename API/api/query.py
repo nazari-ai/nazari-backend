@@ -9,7 +9,7 @@ from typing import List
 from typing import List, Optional
 from dacite import from_dict  # to simply creation of dataclasses from dictionaries.
 
-from models import Twitter, RedditPostTable, RedditCommentTable, Github, Asa
+from models import Twitter, RedditPostTable, RedditCommentTable, Github, AssetTable
 from . import (
     TwitterAnalytics,
     TwitterOverview,
@@ -21,7 +21,9 @@ from . import (
     RedditCommentSchema,
     PerRepo,
     PerTime,
-    AsaData
+    AsaData,
+    AsaList,
+    asa_response
 )
 
 
@@ -31,46 +33,65 @@ startDate = endDate - datetime.timedelta(
 )  # contains 7 days from the current date and time
 
 
+
+
 @strawberry.type
 class Query:
+
     @strawberry.field
-    async def asaData(self, asaID: str) -> AsaData:
+    async def asalist(self) -> AsaList:
+        """
+        
+        
+        """
+        result = await AssetTable.all().values()
+        # result = {key: [i[key] for i in result] for key in result[0]}
+        result = [from_dict(data_class=AsaData, data=x) for x in result]
+        return AsaList(
+            result = result
+            # name = result['name'],
+            # logo = result['logo']
+        )
+
+    @strawberry.field
+    async def asaData(self, asaID: str) -> asa_response:
         """
         Resolver for asa details needed across pera and algoexplorer
         params
             asaID
         returns
-            List[TwitterOverview]
+            List[asa_response]
         """
 
-        result = await Asa.filter(asset_id = asaID).values()
-        result = {key: [i[key] for i in result] for key in result[0]}
-
+        result = await AssetTable.filter(asset_id = asaID).values()
+        print(result)
+        # result = {key: [i[key] for i in result] for key in result[0]}
+        result = [from_dict(data_class=AsaData, data=x) for x in result]
         
-
-        return AsaData(
-            asset_id = result['asset_id'],
-            name = result['name'],
-            logo = result['logo'],
-            unitname_1 = result['unitname_1'],
-            unitname_2 = result['unitname_2'],
-            reputation_pera = result['reputation__pera'],
-            reputation_algoexplorer = result['reputation__algoexplorer'],
-            score_algoexplorer = result['score__algoexplorer'],
-            description = result['description'],
-            URL = result['URL'],
-            usd_value = result['usd_value'],
-            fraction_decimals = result['fraction_decimals'],
-            total_supply = result['total_supply'],
-            circ_supply = result['circ_supply'],
-            creator = result['creator'],
-            category = result['category'],
-            twitter = result['twitter'],
-            telegram = result['telegram'],
-            discord = result['discord'],
-            medium = result['medium'],
-            reddit = result['reddit'],
-            github = result['github']
+        return asa_response(
+            result = result
+            # asset_id = result['asset_id'],
+            # name = result['name'],
+            # logo = result['logo'],
+            # unitname_1 = result['unitname_1'],
+            # unitname_2 = result['unitname_2'],
+            # reputation_pera = result['reputation__pera'],
+            # reputation_algoexplorer = result['reputation__algoexplorer'],
+            # score_algoexplorer = result['score__algoexplorer'],
+            # description = result['description'],
+            # URL = result['URL'],
+            # usd_value = result['usd_value'],
+            # fraction_decimals = result['fraction_decimals'],
+            # total_supply = result['total_supply'],
+            # circ_supply = result['circ_supply'],
+            # creator = result['creator'],
+            # category = result['category'],
+            # twitter = result['twitter'],
+            # telegram = result['telegram'],
+            # discord = result['discord'],
+            # medium = result['medium'],
+            # reddit = result['reddit'],
+            # github = result['github']
 
         )
 

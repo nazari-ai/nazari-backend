@@ -5,7 +5,7 @@ from strawberry.asgi import GraphQL
 from api.query import schema
 
 
-DATABASE_URL = "postgres://postgres:password@127.0.0.1:5432/asalytics"
+DATABASE_URL = "postgres://ernestowojori:password@127.0.0.1:5432/asalytics"
 
 
 def init(app: FastAPI):
