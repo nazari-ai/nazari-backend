@@ -1,31 +1,31 @@
 import strawberry
-from typing import List, Union
+from typing import List, Optional
 
 
 @strawberry.type
 class AsaData:
     asset_id: str
-    name: Union[str, None]
-    logo: Union[str, None]
-    unitname_1: Union[str, None]
-    unitname_2: Union[str, None]
-    reputation__pera: Union[str, None]
-    reputation__algoexplorer: Union[str, None]
-    score__algoexplorer: Union[int, None]
-    description: Union[str, None]
-    URL: Union[str, None]
-    usd_value: Union[str, None]
-    fraction_decimals: Union[int, None]
-    total_supply: Union[str, None]
-    circ_supply: Union[str, None]
-    category: Union[str, None]
-    creator: Union[str, None]
-    twitter: Union[str, None]
-    telegram: Union[str, None]
-    discord: Union[str, None]
-    medium: Union[str, None]
-    reddit: Union[str, None]
-    github: Union[str, None]
+    name: str
+    logo: Optional[str]
+    unitname_1: Optional[str]
+    unitname_2: Optional[str]
+    reputation__pera: str
+    reputation__algoexplorer: str
+    score__algoexplorer: int
+    description: Optional[str]
+    URL: Optional[str]
+    usd_value: Optional[str]
+    fraction_decimals: Optional[int]
+    total_supply: Optional[str]
+    circ_supply: Optional[str]
+    category: Optional[str]
+    creator: Optional[str]
+    twitter: Optional[str]
+    telegram: Optional[str]
+    discord: Optional[str]
+    medium: Optional[str]
+    reddit: Optional[str]
+    github: Optional[str]
     available: bool
 
 
@@ -35,5 +35,14 @@ class AsaResponse:
 
 
 @strawberry.type
+class Asa:
+    name: str
+    asset_id: str
+    available: bool
+    logo: Optional[str]
+    unitname_1: str
+
+
+@strawberry.type
 class AsaList:
-    result: List[AsaData]
+    results: List[Asa]
