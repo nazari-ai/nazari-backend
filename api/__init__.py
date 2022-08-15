@@ -7,3 +7,4 @@ from .definitions.github import (
     PerTime,
 )
 from .definitions.reddit import RedditPostSchema, RedditCommentSchema
+from .definitions.assets import AsaData, AsaList, AsaResponse

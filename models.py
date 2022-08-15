@@ -165,6 +165,7 @@ class AssetTable(Model):
     medium = fields.CharField(max_length=255, null=True)
     reddit = fields.CharField(max_length=255, null=True)
     github = fields.CharField(max_length=255, null=True)
+    available = fields.BooleanField()
 
     class Meta:
         table = "assetTable"
