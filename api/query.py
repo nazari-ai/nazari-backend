@@ -22,7 +22,6 @@ from . import (
     PerTime,
     AsaData,
     AsaList,
-    Asa,
     AsaResponse,
 )
 
@@ -38,9 +37,7 @@ class Query:
     @strawberry.field
     async def asalist(self) -> AsaList:
         """ """
-        result = await AssetTable.all().values(
-            "asset_id", "name", "logo", "unitname_1", "available"
-        )
+        result = await AssetTable.all().values()
         result = [from_dict(data_class=Asa, data=x) for x in result]
         return AsaList(results=result)
 
