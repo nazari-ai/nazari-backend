@@ -38,7 +38,7 @@ class Query:
     async def asalist(self) -> AsaList:
         """ """
         result = await AssetTable.all().values()
-        result = [from_dict(data_class=AsaList, data=x) for x in result]
+        result = [from_dict(data_class=AsaData, data=x) for x in result]
         return AsaList(result=result)
 
     @strawberry.field
