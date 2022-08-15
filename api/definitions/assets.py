@@ -34,15 +34,7 @@ class AsaResponse:
     result: List[AsaData]
 
 
-@strawberry.type
-class Asa:
-    name: str
-    asset_id: str
-    available: bool
-    logo: Optional[str]
-    unitname_1: str
-
 
 @strawberry.type
 class AsaList:
-    results: List[Asa]
+    result: List[AsaData]
