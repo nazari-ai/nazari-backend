@@ -2,6 +2,7 @@ import strawberry
 from tortoise.functions import Sum
 
 import datetime
+import requests
 from typing import List
 
 # from pandas import timedelta_range
@@ -32,6 +33,26 @@ startDate = endDate - datetime.timedelta(
 )  # contains 7 days from the current date and time
 
 
+# third-party API functions
+def get_asset_pera_usdvalue(asset_ID):
+    return (
+        requests.get(f"https://mainnet.api.perawallet.app/v1/assets/{asset_ID}/")
+        .json()
+        .get("usd_value")
+    )
+
+
+def get_asset_finances_page(asset_ID):
+    return (
+        requests.get(
+            f"https://indexer.algoexplorerapi.io/v2/assets/{asset_ID}?include-all=true"
+        )
+        .json()
+        .get("asset")
+        .get("params")
+    )
+
+
 @strawberry.type
 class Query:
     @strawberry.field
@@ -52,7 +73,34 @@ class Query:
         """
 
         result = await AssetTable.filter(asset_id=asaID).values()
-        result = [from_dict(data_class=AsaData, data=x) for x in result]
+        result = [
+            AsaData(
+                asset_id=x["asset_id"],
+                name=x["name"],
+                logo=x["logo"],
+                unitname_1=x["unitname_1"],
+                unitname_2=x["unitname_2"],
+                reputation__pera=x["reputation__pera"],
+                reputation__algoexplorer=x["reputation__algoexplorer"],
+                score__algoexplorer=x["score__algoexplorer"],
+                description=x["description"],
+                URL=x["URL"],
+                usd_value=get_asset_pera_usdvalue(asaID),
+                fraction_decimals=get_asset_finances_page(asaID).get("decimals"),
+                total_supply=get_asset_finances_page(asaID).get("total"),
+                circ_supply=get_asset_finances_page(asaID).get("circulating-supply"),
+                category=x["category"],
+                creator=get_asset_finances_page(asaID).get("creator"),
+                twitter=x["twitter"],
+                telegram=x["telegram"],
+                discord=x["discord"],
+                medium=x["medium"],
+                reddit=x["reddit"],
+                github=x["github"],
+                available=x["available"],
+            )
+            for x in result
+        ]
 
         return AsaResponse(result=result)
 
