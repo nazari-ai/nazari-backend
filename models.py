@@ -14,6 +14,7 @@ class RedditPostTable(Model):
     score = fields.IntField()
     total_comments = fields.IntField()
     post_url = fields.TextField()
+    rank = fields.IntField()
     time_created = fields.DatetimeField(auto_now_add=False)
     asa_id = fields.CharField(max_length=255)
     time_created_day = fields.IntField()
