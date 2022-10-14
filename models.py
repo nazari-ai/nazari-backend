@@ -42,7 +42,7 @@ class Twitter(Model):
     """
     Twitter model
     """
-
+    ID = fields.IntField(pk=True, description="Twitter ID", auto_generate=True)
     tweet_id = fields.BigIntField(pk=True)
     user_id = fields.BigIntField()
     text = fields.TextField()
