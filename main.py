@@ -25,16 +25,37 @@ def switch_to_test_mode():
     ] = "postgres://postgres:password@127.0.0.1:5432/test_{}"
     generate_schemas = True
 
+DB_USER = os.environ.get("DB_USER")
+DB_PASSWORD = os.environ.get("DB_PASSWORD")
+DB_HOST = os.environ.get("DB_HOST")
+DB_PORT = os.environ.get("DB_PORT")
+DB_NAME = os.environ.get("DB_NAME")
 
-TORTOISE_ORM = {
-    "connections": {"default": DATABASE_URL},
-    "apps": {
-        "models": {
-            "models": ["models"],
-            "default_connection": "default",
-        }
-    },
-}
+
+async def init():
+    await Tortoise.init(
+        config={
+			"connections": {
+				"default": {
+					"engine": "tortoise.backends.asyncpg",
+					"credentials": {
+						"database": DB_NAME,
+						"host": DB_HOST,
+						"password": DB_PASSWORD,
+						"user": DB_USER,
+						"port": DB_PORT
+					}
+				}
+			},
+			"apps": {
+				"models": {
+					"models": ["models"],
+					"default_connection": "default",
+				}
+			}
+		}
+    )
+    await Tortoise.generate_schemas()
 app = FastAPI()
 
 origins = ["*"]
