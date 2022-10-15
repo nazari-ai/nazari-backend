@@ -43,7 +43,7 @@ class Twitter(Model):
     Twitter model
     """
     ID = fields.IntField(pk=True, description="Twitter ID", auto_generate=True)
-    tweet_id = fields.BigIntField(pk=True)
+    tweet_id = fields.BigIntField()
     user_id = fields.BigIntField()
     text = fields.TextField()
     posted_at = fields.DatetimeField(auto_now_add=False)
