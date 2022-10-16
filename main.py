@@ -5,13 +5,37 @@ from fastapi.middleware.cors import CORSMiddleware
 from strawberry.asgi import GraphQL
 from api.query import schema
 
-DATABASE_URL = os.environ["DATABASE_URL"]
+DB_USER = os.environ.get("DB_USER")
+DB_PASSWORD = os.environ.get("DB_PASSWORD")
+DB_HOST = os.environ.get("DB_HOST")
+DB_PORT = os.environ.get("DB_PORT")
+DB_NAME = os.environ.get("DB_NAME")
 
+config={
+    "connections": {
+        "default": {
+            "engine": "tortoise.backends.asyncpg",
+            "credentials": {
+                "database": DB_NAME,
+                "host": DB_HOST,
+                "password": DB_PASSWORD,
+                "user": DB_USER,
+                "port": DB_PORT
+            }
+        }
+    },
+    "apps": {
+        "models": {
+            "models": ["models"],
+            "default_connection": "default",
+        }
+    }
+}
 
 def init(app: FastAPI):
     register_tortoise(
         app,
-        db_url=DATABASE_URL,
+        config=config,
         modules={"models": ["models"]},
         generate_schemas=True,
         add_exception_handlers=True,
@@ -25,37 +49,7 @@ def switch_to_test_mode():
     ] = "postgres://postgres:password@127.0.0.1:5432/test_{}"
     generate_schemas = True
 
-DB_USER = os.environ.get("DB_USER")
-DB_PASSWORD = os.environ.get("DB_PASSWORD")
-DB_HOST = os.environ.get("DB_HOST")
-DB_PORT = os.environ.get("DB_PORT")
-DB_NAME = os.environ.get("DB_NAME")
 
-
-async def init():
-    await Tortoise.init(
-        config={
-			"connections": {
-				"default": {
-					"engine": "tortoise.backends.asyncpg",
-					"credentials": {
-						"database": DB_NAME,
-						"host": DB_HOST,
-						"password": DB_PASSWORD,
-						"user": DB_USER,
-						"port": DB_PORT
-					}
-				}
-			},
-			"apps": {
-				"models": {
-					"models": ["models"],
-					"default_connection": "default",
-				}
-			}
-		}
-    )
-    await Tortoise.generate_schemas()
 app = FastAPI()
 
 origins = ["*"]
