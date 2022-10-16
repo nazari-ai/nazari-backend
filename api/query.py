@@ -215,6 +215,7 @@ class Query:
         post_table = (
             await RedditPostTable.filter(asa_id=asaID)
             .filter(time_created__range=[startDate, endDate])
+            .order_by("rank")
             .values()
         )
 
@@ -243,6 +244,7 @@ class Query:
 
             post_json = RedditPostSchema(
                 asaID=post_data["asa_id"],
+                rank=post_data["rank"],
                 post_id=post_data["post_id"],
                 post_title=post_data["title"],
                 post_text=post_data["post_text"],
