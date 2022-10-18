@@ -201,9 +201,7 @@ class Query:
         return Response(asaID=asaID, results=result)
 
     @strawberry.field
-    async def redditAnalytics(
-        self, asaID: str, startDate: str = startDate, endDate: str = endDate
-    ) -> List[RedditPostSchema]:
+    async def redditAnalytics(self, asaID: str) -> List[RedditPostSchema]:
         """Resolver to generate a list of reddit posts with each post's comments nested in the schema.
         params
             asaID
@@ -213,10 +211,7 @@ class Query:
             List[RedditPostSchema]
         """
         post_table = (
-            await RedditPostTable.filter(asa_id=asaID)
-            .filter(time_created__range=[startDate, endDate])
-            .order_by("rank")
-            .values()
+            await RedditPostTable.filter(asa_id=asaID).order_by("rank").values()
         )
 
         if not post_table:
