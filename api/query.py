@@ -127,7 +127,7 @@ class Query:
 
         if not result:
             raise Exception("Error! ASA not found!")
-        result = from_dict(data_class=TwitterOverview, data=result)
+        result = {key: [i[key] for i in result] for key in result[0]}
 
         return TwitterOverview(
             asaID=asaID,
