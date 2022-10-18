@@ -122,7 +122,7 @@ class Query:
                 likeTotal=Sum("likes"),
                 tweetTotal=Count("text"),
             )
-            .values()
+            .values("sentimentTotal", "retweetTotal", "likeTotal", "tweetTotal")
         )
 
         if not result:
