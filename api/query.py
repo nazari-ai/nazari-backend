@@ -131,10 +131,10 @@ class Query:
 
         return TwitterOverview(
             asaID=asaID,
-            tweetTotal=result.tweetTotal,
-            likeTotal=result.likeTotal,
-            retweetTotal=result.retweetTotal,
-            sentimentTotal=result.sentimentTotal,
+            tweetTotal=result["tweetTotal"],
+            likeTotal=result["likeTotal"],
+            retweetTotal=result["retweetTotal"],
+            sentimentTotal=result["sentimentTotal"],
         )
 
     @strawberry.field
