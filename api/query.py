@@ -1,5 +1,5 @@
 import strawberry
-from tortoise.functions import Sum
+from tortoise.functions import Sum, Avg, Count
 
 import datetime
 import requests
@@ -114,20 +114,27 @@ class Query:
         returns
             List[TwitterOverview]
         """
-        result = await Twitter.filter(asa_id=asaID).values(
-            "sentiment_score", "retweets", "likes", "text"
+        result = (
+            await Twitter.filter(asa_id=asaID)
+            .annotate(
+                sentimentTotal=Avg("sentiment_score"),
+                retweetTotal=Sum("retweets"),
+                likeTotal=Sum("likes"),
+                tweetTotal=Count("text"),
+            )
+            .values("sentimentTotal", "retweetTotal", "likeTotal", "tweetTotal")
         )
 
         if not result:
             raise Exception("Error! ASA not found!")
-        result = {key: [i[key] for i in result] for key in result[0]}
+        result = result.pop()
 
         return TwitterOverview(
             asaID=asaID,
-            tweetTotal=len(result["text"]),
-            likeTotal=sum(result["likes"]),
-            retweetTotal=sum(result["retweets"]),
-            sentimentTotal=sum(result["sentiment_score"]),
+            tweetTotal=result["tweetTotal"],
+            likeTotal=result["likeTotal"],
+            retweetTotal=result["retweetTotal"],
+            sentimentTotal=result["sentimentTotal"],
         )
 
     @strawberry.field
