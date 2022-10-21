@@ -118,8 +118,8 @@ class Query:
             await Twitter.filter(asa_id=asaID)
             .annotate(
                 sentimentTotal=Avg("sentiment_score"),
-                retweetTotal=Sum("retweets"),
-                likeTotal=Sum("likes"),
+                retweetTotal=Avg("retweets"),
+                likeTotal=Avg("likes"),
                 tweetTotal=Count("text"),
             )
             .values("sentimentTotal", "retweetTotal", "likeTotal", "tweetTotal")
