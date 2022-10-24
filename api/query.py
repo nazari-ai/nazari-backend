@@ -56,10 +56,15 @@ def get_asset_finances_page(asset_ID):
 @strawberry.type
 class Query:
     @strawberry.field
-    async def asalist(self) -> AsaList:
+    async def asalist(self, start_index: int = 0, end_index: int = 50) -> AsaList:
         """ """
         result = await AssetTable.all().values()
-        result = [from_dict(data_class=AsaData, data=x) for x in result]
+        start_index, end_index = min(start_index, len(result) - 50), min(
+            end_index, len(result)
+        )
+        result = [
+            from_dict(data_class=AsaData, data=x) for x in result[start_index:end_index]
+        ]
         return AsaList(result=result)
 
     @strawberry.field
