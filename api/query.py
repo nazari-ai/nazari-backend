@@ -60,9 +60,8 @@ class Query:
         """ """
         result = await AssetTable.all().values()
         result_length = len(result)
-        start_index, end_index = min(start_index, result_length - 1), min(
-            end_index, result_length
-        )
+        start_index = min(start_index, result_length - 1)
+        end_index = min(end_index, result_length)
         result = [
             AsaData(
                 asset_total=result_length,
@@ -177,6 +176,8 @@ class Query:
         endDate: Optional[str] = endDate,
         weekday: bool = False,
         hour: bool = False,
+        start_index: int = 0,
+        end_index: int = 500,
     ) -> Response:
         """
         Resolver to generate Twitter analytics for an ASA depending on parameters.
@@ -236,7 +237,15 @@ class Query:
                 .group_by("posted_at")
                 .values("posted_at", "likes", "retweets", "sentiment")
             )
-        result = [from_dict(data_class=TwitterAnalytics, data=x) for x in result]
+
+        result_length = len(result)
+        start_index = min(start_index, result_length - 1)
+        end_index = min(end_index, result_length)
+
+        result = [
+            from_dict(data_class=TwitterAnalytics, data=x)
+            for x in result[start_index:end_index]
+        ]
         return Response(asaID=asaID, results=result)
 
     @strawberry.field
