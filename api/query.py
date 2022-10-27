@@ -59,11 +59,38 @@ class Query:
     async def asalist(self, start_index: int = 0, end_index: int = 50) -> AsaList:
         """ """
         result = await AssetTable.all().values()
-        start_index, end_index = min(start_index, len(result) - 50), min(
-            end_index, len(result)
+        result_length = len(result)
+        start_index, end_index = min(start_index, result_length - 1), min(
+            end_index, result_length
         )
         result = [
-            from_dict(data_class=AsaData, data=x) for x in result[start_index:end_index]
+            AsaData(
+                asset_total=result_length,
+                asset_id=x["asset_id"],
+                name=x["name"],
+                logo=x["logo"],
+                unitname_1=x["unitname_1"],
+                unitname_2=x["unitname_2"],
+                reputation__pera=x["reputation__pera"],
+                reputation__algoexplorer=x["reputation__algoexplorer"],
+                score__algoexplorer=x["score__algoexplorer"],
+                description=x["description"],
+                URL=x["URL"],
+                usd_value=x["usd_value"],
+                fraction_decimals=x["fraction_decimals"],
+                total_supply=x["total_supply"],
+                circ_supply=x["circ_supply"],
+                category=x["category"],
+                creator=x["creator"],
+                twitter=x["twitter"],
+                telegram=x["telegram"],
+                discord=x["discord"],
+                medium=x["medium"],
+                reddit=x["reddit"],
+                github=x["github"],
+                available=x["available"],
+            )
+            for x in result[start_index:end_index]
         ]
         return AsaList(result=result)
 

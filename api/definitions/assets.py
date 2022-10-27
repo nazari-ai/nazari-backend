@@ -27,12 +27,12 @@ class AsaData:
     reddit: Optional[str]
     github: Optional[str]
     available: bool
+    asset_total: int
 
 
 @strawberry.type
 class AsaResponse:
     result: List[AsaData]
-
 
 
 @strawberry.type
