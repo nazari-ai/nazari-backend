@@ -52,6 +52,25 @@ def get_asset_finances_page(asset_ID):
         .get("params")
     )
 
+def agg_sentiment(sentiment: List):
+
+    '''
+    Custom function for sentiment aggregation
+    '''
+
+    senti_dict = {"positive": 0,
+                "negative": 0,
+                "neutral": 0}
+    for s in sentiment:
+        if s > 0:
+            senti_dict["positive"] +=1
+        elif s < 0:
+            senti_dict["negative"] +=1
+        else:
+            senti_dict["neutral"] +=1
+
+    return senti_dict
+
 
 @strawberry.type
 class Query:
@@ -173,7 +192,7 @@ class Query:
                 .annotate(
                     likes=Sum("likes"),
                     retweets=Sum("retweets"),
-                    sentiment=Sum("sentiment_score"),
+                    sentiment=agg_sentiment("sentiment_score"),
                 )
                 .group_by("weekday")
                 .values("weekday", "likes", "retweets", "sentiment")
@@ -186,7 +205,7 @@ class Query:
                 .annotate(
                     likes=Sum("likes"),
                     retweets=Sum("retweets"),
-                    sentiment=Sum("sentiment_score"),
+                    sentiment=agg_sentiment("sentiment_score"),
                 )
                 .group_by("hour")
                 .values(
