@@ -22,6 +22,7 @@ from . import (
     PerRepo,
     PerTime,
     AsaData,
+    AsaDataPagination,
     AsaList,
     AsaResponse,
 )
@@ -81,7 +82,7 @@ class Query:
         start_index = min(start_index, result_length - 1)
         end_index = min(end_index, result_length)
         result = [
-            AsaData(
+            AsaDataPagination(
                 asset_total=result_length,
                 asset_id=x["asset_id"],
                 name=x["name"],
