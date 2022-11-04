@@ -52,22 +52,21 @@ def get_asset_finances_page(asset_ID):
         .get("params")
     )
 
+
 def agg_sentiment(sentiment: List):
 
-    '''
+    """
     Custom function for sentiment aggregation
-    '''
+    """
 
-    senti_dict = {"positive": 0,
-                "negative": 0,
-                "neutral": 0}
+    senti_dict = {"positive": 0, "negative": 0, "neutral": 0}
     for s in sentiment:
         if s > 0:
-            senti_dict["positive"] +=1
+            senti_dict["positive"] += 1
         elif s < 0:
-            senti_dict["negative"] +=1
+            senti_dict["negative"] += 1
         else:
-            senti_dict["neutral"] +=1
+            senti_dict["neutral"] += 1
 
     return senti_dict
 
@@ -110,6 +109,13 @@ class Query:
             )
             for x in result[start_index:end_index]
         ]
+        return AsaList(result=result)
+
+    @strawberry.field
+    async def asaname_search(self, name_search: str) -> AsaList:
+        """ """
+        result = await AssetTable.filter(name__icontains=name_search).values()
+        result = [from_dict(data_class=AsaData, data=x) for x in result]
         return AsaList(result=result)
 
     @strawberry.field
@@ -195,8 +201,8 @@ class Query:
         endDate: Optional[str] = endDate,
         weekday: bool = False,
         hour: bool = False,
-        start_index: int = 0,
-        end_index: int = 500,
+        # start_index: int = 0,
+        # end_index: int = 500,
     ) -> Response:
         """
         Resolver to generate Twitter analytics for an ASA depending on parameters.
@@ -257,13 +263,13 @@ class Query:
                 .values("posted_at", "likes", "retweets", "sentiment")
             )
 
-        result_length = len(result)
-        start_index = min(start_index, result_length - 1)
-        end_index = min(end_index, result_length)
+        # result_length = len(result)
+        # start_index = min(start_index, result_length - 1)
+        # end_index = min(end_index, result_length)
 
         result = [
             from_dict(data_class=TwitterAnalytics, data=x)
-            for x in result[start_index:end_index]
+            for x in result  # [start_index:end_index]
         ]
         return Response(asaID=asaID, results=result)
 
