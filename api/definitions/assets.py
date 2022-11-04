@@ -64,4 +64,4 @@ class AsaResponse:
 
 @strawberry.type
 class AsaList:
-    result: List[AsaData]
+    result: List[AsaDataPagination]

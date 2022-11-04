@@ -113,7 +113,7 @@ class Query:
         return AsaList(result=result)
 
     @strawberry.field
-    async def asaname_search(self, name_search: str) -> AsaList:
+    async def asaname_search(self, name_search: str) -> AsaResponse:
         """ """
         result = await AssetTable.filter(name__icontains=name_search).values()
         result = [from_dict(data_class=AsaData, data=x) for x in result]
