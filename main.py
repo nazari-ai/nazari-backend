@@ -5,11 +5,18 @@ from fastapi.middleware.cors import CORSMiddleware
 from strawberry.asgi import GraphQL
 from api.query import schema
 
-DB_USER = os.environ.get("DB_USER")
-DB_PASSWORD = os.environ.get("DB_PASSWORD")
-DB_HOST = os.environ.get("DB_HOST")
-DB_PORT = os.environ.get("DB_PORT")
-DB_NAME = os.environ.get("DB_NAME")
+# DB_USER = os.environ.get("DB_USER")
+# DB_PASSWORD = os.environ.get("DB_PASSWORD")
+# DB_HOST = os.environ.get("DB_HOST")
+# DB_PORT = os.environ.get("DB_PORT")
+# DB_NAME = os.environ.get("DB_NAME")
+
+
+DB_USER = "postgres"
+DB_PASSWORD = "1234"
+DB_HOST = "localhost"
+DB_PORT = "5432"
+DB_NAME = "postgres"
 
 config={
     "connections": {

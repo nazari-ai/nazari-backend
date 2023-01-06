@@ -11,6 +11,9 @@ class RedditPostSchema:
     num_of_comments: int
     score: int
     sentimentScore: float
+    sentimentScorePos: float
+    sentimentScoreNeg: float
+    sentimentScoreNeu: float
     rank: int
     more: List["RedditCommentSchema"]
 
@@ -20,4 +23,7 @@ class RedditCommentSchema:
     comment_id: str
     comment_score: int
     comment_sentiment_score: float
+    comment_sentiment_score_pos: float
+    comment_sentiment_score_neg: float
+    comment_sentiment_score_neu: float
     post_id: str

@@ -1,5 +1,6 @@
 import strawberry
 from tortoise.functions import Sum, Avg, Count
+from tortoise.expressions import Q
 
 import datetime
 import requests
@@ -174,12 +175,29 @@ class Query:
         result = (
             await Twitter.filter(asa_id=asaID)
             .annotate(
-                sentimentTotal=Avg("sentiment_score"),
                 retweetTotal=Avg("retweets"),
                 likeTotal=Avg("likes"),
                 tweetTotal=Count("text"),
+                sentimentTotal=Avg("sentiment_score"),
+                sentimentTotalPos=Count(
+                    "sentiment_score", _filter=Q(sentiment_score__gt=0)
+                ),
+                sentimentTotalNeg=Count(
+                    "sentiment_score", _filter=Q(sentiment_score__lt=0)
+                ),
+                sentimentTotalNeu=Count(
+                    "sentiment_score", _filter=Q(sentiment_score=0)
+                ),
             )
-            .values("sentimentTotal", "retweetTotal", "likeTotal", "tweetTotal")
+            .values(
+                "retweetTotal",
+                "likeTotal",
+                "tweetTotal",
+                "sentimentTotal",
+                "sentimentTotalPos",
+                "sentimentTotalNeg",
+                "sentimentTotalNeu",
+            )
         )
 
         if not result:
@@ -192,6 +210,9 @@ class Query:
             likeTotal=result["likeTotal"],
             retweetTotal=result["retweetTotal"],
             sentimentTotal=result["sentimentTotal"],
+            sentimentTotalPos=result["sentimentTotalPos"],
+            sentimentTotalNeg=result["sentimentTotalNeg"],
+            sentimentTotalNeu=result["sentimentTotalNeu"],
         )
 
     @strawberry.field
@@ -227,10 +248,25 @@ class Query:
                 .annotate(
                     likes=Sum("likes"),
                     retweets=Sum("retweets"),
-                    sentiment=agg_sentiment("sentiment_score"),
+                    sentiment=Sum("sentiment_score"),
+                    sentimentPos=Count(
+                        "sentiment_score", _filter=Q(sentiment_score__gt=0)
+                    ),
+                    sentimentNeg=Count(
+                        "sentiment_score", _filter=Q(sentiment_score__lt=0)
+                    ),
+                    sentimentNeu=Count("sentiment_score", _filter=Q(sentiment_score=0)),
                 )
                 .group_by("weekday")
-                .values("weekday", "likes", "retweets", "sentiment")
+                .values(
+                    "weekday",
+                    "likes",
+                    "retweets",
+                    "sentiment_score",
+                    "sentimentPos",
+                    "sentimentNeg",
+                    "sentimentNeu",
+                )
             )
 
         if hour:
@@ -240,14 +276,24 @@ class Query:
                 .annotate(
                     likes=Sum("likes"),
                     retweets=Sum("retweets"),
-                    sentiment=agg_sentiment("sentiment_score"),
+                    sentiment=Sum("sentiment_score"),
+                    sentimentPos=Count(
+                        "sentiment_score", _filter=Q(sentiment_score__gt=0)
+                    ),
+                    sentimentNeg=Count(
+                        "sentiment_score", _filter=Q(sentiment_score__lt=0)
+                    ),
+                    sentimentNeu=Count("sentiment_score", _filter=Q(sentiment_score=0)),
                 )
                 .group_by("hour")
                 .values(
                     "hour",
                     "likes",
                     "retweets",
-                    "sentiment",
+                    "sentiment_score",
+                    "sentimentPos",
+                    "sentimentNeg",
+                    "sentimentNeu",
                 )
             )
 
@@ -285,8 +331,17 @@ class Query:
             List[RedditPostSchema]
         """
         post_table = (
-            await RedditPostTable.filter(asa_id=asaID).order_by("rank").values()
+            await RedditPostTable.filter(asa_id=asaID)
+            .annotate(
+                sentimentPos=Count("sentiment_score", _filter=Q(sentiment_score__gt=0)),
+                sentimentNeg=Count("sentiment_score", _filter=Q(sentiment_score__lt=0)),
+                sentimentNeu=Count("sentiment_score", _filter=Q(sentiment_score=0)),
+            )
+            .order_by("rank")
+            .values()
         )
+
+        # print(post_table)
 
         if not post_table:
             raise Exception("Error! ASA not found!")
@@ -298,14 +353,31 @@ class Query:
             returns
                 RedditPostSchema    the JSON representation of each reddit post as needed by the client.
             """
-            comment_table = await RedditCommentTable.filter(
-                post_id=post_data["post_id"]
-            ).values()
+            comment_table = (
+                await RedditCommentTable.filter(post_id=post_data["post_id"])
+                .annotate(
+                    sentimentPos=Count(
+                        "sentiment_score", _filter=Q(sentiment_score__gt=0)
+                    ),
+                    sentimentNeg=Count(
+                        "sentiment_score", _filter=Q(sentiment_score__lt=0)
+                    ),
+                    sentimentNeu=Count("sentiment_score", _filter=Q(sentiment_score=0)),
+                )
+                .group_by("comment_id")
+                .values()
+            )
+
+            print(comment_table)
+
             comment_data = [
                 RedditCommentSchema(
                     comment_id=comment["comment_id"],
                     comment_score=comment["score"],
                     comment_sentiment_score=comment["sentiment_score"],
+                    comment_sentiment_score_pos=comment["sentimentPos"],
+                    comment_sentiment_score_neg=comment["sentimentNeg"],
+                    comment_sentiment_score_neu=comment["sentimentNeu"],
                     post_id=comment["post_id"],
                 )
                 for comment in comment_table
@@ -320,6 +392,9 @@ class Query:
                 num_of_comments=post_data["total_comments"],
                 score=post_data["score"],
                 sentimentScore=post_data["sentiment_score"],
+                sentimentScorePos=post_data["sentimentPos"],
+                sentimentScoreNeg=post_data["sentimentNeg"],
+                sentimentScoreNeu=post_data["sentimentNeu"],
                 more=comment_data,
             )
             return post_json

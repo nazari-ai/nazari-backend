@@ -10,6 +10,9 @@ class TwitterOverview:
     likeTotal: int
     retweetTotal: int
     sentimentTotal: float
+    sentimentTotalPos: float
+    sentimentTotalNeg: float
+    sentimentTotalNeu: float
 
 
 @strawberry.type
@@ -19,7 +22,9 @@ class TwitterAnalytics:
     hour: Union[int, None]
     likes: int
     retweets: int
-    sentiment: float
+    sentimentPos: float
+    sentimentNeg: float
+    sentimentNeu: float
 
 
 @strawberry.type
