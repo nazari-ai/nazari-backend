@@ -11,7 +11,7 @@ DB_HOST = os.environ.get("DB_HOST")
 DB_PORT = os.environ.get("DB_PORT")
 DB_NAME = os.environ.get("DB_NAME")
 
-config={
+config = {
     "connections": {
         "default": {
             "engine": "tortoise.backends.asyncpg",
@@ -20,8 +20,8 @@ config={
                 "host": DB_HOST,
                 "password": DB_PASSWORD,
                 "user": DB_USER,
-                "port": DB_PORT
-            }
+                "port": DB_PORT,
+            },
         }
     },
     "apps": {
@@ -29,8 +29,9 @@ config={
             "models": ["models"],
             "default_connection": "default",
         }
-    }
+    },
 }
+
 
 def init(app: FastAPI):
     register_tortoise(
