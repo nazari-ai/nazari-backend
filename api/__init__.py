@@ -1,4 +1,11 @@
-from .definitions.twitter import TwitterAnalytics, TwitterOverview, Response
+from .definitions.twitter import (
+    TwitterAnalytics,
+    TwitterOverview,
+    Response,
+    Engagement,
+    TweetStats,
+    EngagementResponse,
+)
 from .definitions.github import (
     GithubAnalyticsPerTime,
     GithubOverview,
@@ -6,5 +13,11 @@ from .definitions.github import (
     PerRepo,
     PerTime,
 )
-from .definitions.reddit import RedditPostSchema, RedditCommentSchema
+from .definitions.reddit import (
+    RedditPostSchema,
+    RedditCommentSchema,
+    RedditEngagement,
+    RedditStats,
+    RedditEngagementResponse,
+)
 from .definitions.assets import AsaData, AsaDataPagination, AsaList, AsaResponse

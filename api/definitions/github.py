@@ -48,3 +48,21 @@ class PerRepo:
 @strawberry.type
 class PerTime:
     repo: List[GithubAnalyticsPerTime]
+
+
+@strawberry.type
+class RepoRank:
+    repo_id: str
+    repo_rank: float
+
+
+@strawberry.type
+class AssetRank:
+    asset_id: str
+    asset_rank: float
+
+
+@strawberry.type
+class GitHubPageRank:
+    repos_rank: List[RepoRank]
+    assets_rank: List[AssetRank]
