@@ -1,7 +1,4 @@
-from typing import List
-
 import numpy as np
-import strawberry
 
 from api.definitions.github import AssetRank, GitHubPageRank, RepoRank
 from models import Github
@@ -43,6 +40,10 @@ async def get_github_page_rank() -> GitHubPageRank:
         RepoRank(repo_id=k, repo_rank=v) for k, v in zip(repo_ids, repo_rank)
     ]
 
+    sorted_repo_ids_rank_mapping = sorted(
+        repo_ids_rank_mapping, key=lambda x: x.repo_rank, reverse=True
+    )
+
     asset_rank = {}
     for i in repo_ids_rank_mapping:
         repo_id, rank = i.repo_id, i.repo_rank
@@ -50,6 +51,10 @@ async def get_github_page_rank() -> GitHubPageRank:
 
         asset_rank[repo_name] = asset_rank.get(repo_name, 0) + rank
 
-    asset_rank = [AssetRank(asset_id=k, asset_rank=v) for k, v in asset_rank.items()]
+    asset_ranks = [AssetRank(asset_id=k, asset_rank=v) for k, v in asset_rank.items()]
 
-    return GitHubPageRank(repos_rank=repo_ids_rank_mapping, assets_rank=asset_rank)
+    sorted_asset_ranks = sorted(asset_ranks, key=lambda x: x.asset_rank, reverse=True)
+
+    return GitHubPageRank(
+        repos_ranks=sorted_repo_ids_rank_mapping, assets_ranks=sorted_asset_ranks
+    )

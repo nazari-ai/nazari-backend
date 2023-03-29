@@ -8,9 +8,9 @@ import strawberry
 from dacite import from_dict
 from tortoise.expressions import Q
 from tortoise.functions import Avg, Count, Sum
+
 from api.resolvers.github_resolver import GitHubPageRank, get_github_page_rank
 from api.resolvers.reddit_resolver import get_reddit_engagement_stats
-
 from models import AssetTable, Github, RedditCommentTable, RedditPostTable, Twitter
 
 from . import (
@@ -18,18 +18,18 @@ from . import (
     AsaDataPagination,
     AsaList,
     AsaResponse,
+    EngagementResponse,
     GithubAnalyticsPerRepo,
     GithubAnalyticsPerTime,
     GithubOverview,
     PerRepo,
     PerTime,
     RedditCommentSchema,
+    RedditEngagementResponse,
     RedditPostSchema,
     Response,
     TwitterAnalytics,
     TwitterOverview,
-    EngagementResponse,
-    RedditEngagementResponse,
 )
 from .resolvers.twitter_resolver import get_engagement_stats
 
@@ -308,7 +308,7 @@ class Query:
                 .annotate(
                     likes=Sum("likes"),
                     retweets=Sum("retweets"),
-                    sentiment_score=Sum("sentiment_score"),
+                    sentimentScore=Sum("sentiment_score"),
                     sentimentPos=Count(
                         "sentiment_score", _filter=Q(sentiment_score__gt=0)
                     ),
@@ -322,7 +322,7 @@ class Query:
                     "posted_at",
                     "likes",
                     "retweets",
-                    "sentiment_score",
+                    "sentimentScore",
                     "sentimentPos",
                     "sentimentNeg",
                     "sentimentNeu",

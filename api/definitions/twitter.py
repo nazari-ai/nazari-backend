@@ -1,6 +1,7 @@
-from typing import List, Optional, Union
-import strawberry
 from datetime import datetime
+from typing import List, Optional, Union
+
+import strawberry
 
 
 @strawberry.type
@@ -22,10 +23,10 @@ class TwitterAnalytics:
     hour: Union[int, None]
     likes: int
     retweets: int
-    sentiment_score: float
     sentimentPos: float
     sentimentNeg: float
     sentimentNeu: float
+    sentimentScore: Optional[float]
 
 
 @strawberry.type
@@ -48,13 +49,18 @@ class TweetStats:
 @strawberry.type
 class Engagement:
     name: str
-    logo: str
-    total_supply: str
-    available: str
-    circ_supply: str
-    most_engaged_tweet: Optional[str]
-    total_retweets: Optional[int]
-    total_likes: Optional[int]
+    logo: Optional[str]
+    total_supply: Optional[str]
+    available: Optional[str]
+    circ_supply: Optional[str]
+    plf: str
+    prf: str
+    pr: str
+    top_tweet_id: str
+    top_tweet_retweets: Optional[int]
+    top_tweet_likes: Optional[int]
+    asa_total_retweets: Optional[int]
+    asa_total_likes: Optional[int]
     total_tweets: Optional[int]
     total_followers: Optional[int]
     total_mentions: Optional[int]
