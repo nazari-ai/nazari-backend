@@ -15,8 +15,8 @@ class RedditPostTable(Model):
     total_comments = fields.IntField()
     post_url = fields.TextField()
     rank = fields.IntField()
-    time_created = fields.DatetimeField(auto_now_add=False)
-    asa_id = fields.CharField(max_length=255)
+    time_created = fields.DatetimeField(auto_now_add=False, index=True)
+    asa_id = fields.CharField(max_length=255, index=True)
     time_created_day = fields.IntField()
     time_created_month = fields.IntField()
     time_created_year = fields.IntField()
@@ -43,12 +43,13 @@ class Twitter(Model):
     """
     Twitter model
     """
+
     ID = fields.IntField(pk=True, description="Twitter ID", auto_generate=True)
     tweet_id = fields.BigIntField()
     user_id = fields.BigIntField()
     text = fields.TextField()
-    posted_at = fields.DatetimeField(auto_now_add=False)
-    asa_id = fields.TextField()
+    posted_at = fields.DatetimeField(auto_now_add=False, index=True)
+    asa_id = fields.CharField(index=True, max_length=255)
     weekday_int = fields.IntField()
     day = fields.IntField()
     month = fields.IntField()
@@ -74,12 +75,12 @@ Twitter_Pydantic = pydantic_model_creator(
 
 
 class RedditCommentTable(Model):
-    comment_id = fields.CharField(pk=True, max_length=255)
+    comment_id = fields.CharField(pk=True, max_length=255, index=True)
     body = fields.TextField()
     score = fields.IntField()
     post = fields.ForeignKeyField("models.RedditPostTable", related_name="parent_id")
-    created_at = fields.DatetimeField(auto_now_add=False)
-    asa_id = fields.IntField()
+    created_at = fields.DatetimeField(auto_now_add=False, index=True)
+    asa_id = fields.IntField(index=True)
     created_at_day = fields.IntField()
     created_at_month = fields.IntField()
     created_at_year = fields.IntField()
@@ -113,7 +114,7 @@ class Github(Model):
     no_of_commits = fields.IntField()
     issues = fields.IntField()
     pull_requests = fields.IntField()
-    asa_id = fields.CharField(max_length=255)
+    asa_id = fields.CharField(max_length=255, index=True)
     last_push_date_day = fields.IntField()
     last_push_date_month = fields.IntField()
     last_push_date_year = fields.IntField()
@@ -143,8 +144,7 @@ Github_Pydantic = pydantic_model_creator(
 
 
 class AssetTable(Model):
-
-    asset_id = fields.CharField(pk=True, max_length=255)
+    asset_id = fields.CharField(pk=True, max_length=255, index=True)
     name = fields.CharField(max_length=255)
     logo = fields.TextField(null=True)
     unitname_1 = fields.CharField(max_length=255, null=True)

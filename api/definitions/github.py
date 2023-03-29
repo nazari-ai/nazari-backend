@@ -64,5 +64,5 @@ class AssetRank:
 
 @strawberry.type
 class GitHubPageRank:
-    repos_rank: List[RepoRank]
-    assets_rank: List[AssetRank]
+    repos_ranks: List[RepoRank]
+    assets_ranks: List[AssetRank]

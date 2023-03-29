@@ -44,14 +44,19 @@ class RedditStats:
 class RedditEngagement:
     asa_id: str
     name: str
-    logo: str
-    total_supply: str
-    available: str
-    circ_supply: str
-    most_engaged_post: Optional[str]
-    total_upvotes: Optional[int]
-    total_comments: Optional[int]
+    logo: Optional[str]
+    total_supply: Optional[str]
+    available: Optional[str]
+    circ_supply: Optional[str]
+    top_post_id: Optional[str]
+    top_post_upvotes: Optional[int]
+    top_post_comments: Optional[int]
+    asa_total_comments: Optional[int]
+    asa_total_upvotes: Optional[int]
     total_posts: Optional[int]
+    puf: Optional[float]
+    pcf: Optional[float]
+    pr: Optional[float]
 
 
 @strawberry.type
